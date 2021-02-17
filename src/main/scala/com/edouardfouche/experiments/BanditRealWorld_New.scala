@@ -109,7 +109,7 @@ object BanditRealWorld_New extends BanditExperiment {
     info(s"nRep: ${nRep}")
 
     for {
-      scalingstrategy <- scalingstrategies//.par
+      scalingstrategy <- scalingstrategies.par
     } {
       for{
         banditConstructor <- banditConstructors.par
