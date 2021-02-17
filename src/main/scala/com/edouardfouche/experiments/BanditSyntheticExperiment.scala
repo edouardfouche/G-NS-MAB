@@ -19,7 +19,7 @@ package com.edouardfouche.experiments
 import breeze.linalg
 import breeze.stats.distributions.{RandBasis, ThreadLocalRandomGenerator}
 import com.edouardfouche.monitoring.bandits.adversarial._
-import com.edouardfouche.monitoring.bandits.nonstationary.{CUCB_ADWIN, MPKLUCB_ADWIN, MPTS_ADWIN}
+import com.edouardfouche.monitoring.bandits.nonstationary.{MP_AW_UCB, MP_AW_KL_UCB, MP_AW_TS}
 import com.edouardfouche.monitoring.bandits.stationary._
 import com.edouardfouche.monitoring.rewards.AbsoluteThreshold
 import com.edouardfouche.monitoring.scalingstrategies._
@@ -53,17 +53,17 @@ trait BanditSyntheticExperiment extends BanditExperiment {
     //,//, Exp3M(0.1)(_, _, _, _),
     MPTS, IMPTS, MPOTS,
     Exp3M,
-    //MPDTS(0.9)(_,_,_,_),
+    //MP_D_TS(0.9)(_,_,_,_),
     // IMPTS, MPOTS,
-    //MPEGreedy(0.9)(_, _, _, _),
-    //MPEGreedy(1)(_, _, _, _), MPEGreedy(0.9)(_, _, _, _)//, MPEGreedy(0.95)(_, _, _, _), MPEGreedy(0.9)(_, _, _, _), MPEGreedy(0.8)(_, _, _, _), MPEGreedy(0.7)(_, _, _, _)
-    CUCB_ADWIN(0.1)(_,_,_,_),
-    MPKLUCB_ADWIN(0.1)(_,_,_,_),
-    MPTS_ADWIN(0.1)(_,_,_,_),
+    //MP_E_Greedy(0.9)(_, _, _, _),
+    //MP_E_Greedy(1)(_, _, _, _), MP_E_Greedy(0.9)(_, _, _, _)//, MP_E_Greedy(0.95)(_, _, _, _), MP_E_Greedy(0.9)(_, _, _, _), MP_E_Greedy(0.8)(_, _, _, _), MP_E_Greedy(0.7)(_, _, _, _)
+    MP_AW_UCB(0.1)(_,_,_,_),
+    MP_AW_KL_UCB(0.1)(_,_,_,_),
+    MP_AW_TS(0.1)(_,_,_,_),
     Exp3M_ADWIN(0.1)(_,_,_,_)
-    //MPTS_ADWIN(1)(_,_,_,_),
-    //MPTS_ADWIN(0.01)(_,_,_,_),
-    //MPTS_ADWIN(0.001)(_,_,_,_)
+    //MP_AW_TS(1)(_,_,_,_),
+    //MP_AW_TS(0.01)(_,_,_,_),
+    //MP_AW_TS(0.001)(_,_,_,_)
   )
 
   def run(): Unit = {

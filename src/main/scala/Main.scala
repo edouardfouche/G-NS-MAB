@@ -63,22 +63,7 @@ object Main extends LazyLogging {
   }
 
   def experimentFactory(arg: String): Unit = arg match {
-    case "com.edouardfouche.experiments.BanditKomiyama" => BanditKomiyama.run()
-    case "com.edouardfouche.experiments.BanditStatic" => BanditStatic.run()
-    case "com.edouardfouche.experiments.BanditCache" => BanditCache.run()
-    case "com.edouardfouche.experiments.BanditNonStaticAbrupt" => BanditNonStaticAbrupt.run()
-    case "com.edouardfouche.experiments.BanditNonStaticGradual" => BanditNonStaticGradual.run()
-    case "com.edouardfouche.experiments.BanditNonStaticGlobal" => BanditNonStaticGlobal.run()
-    case "com.edouardfouche.experiments.BanditRealWorld" => BanditRealWorld.run()
-    case "com.edouardfouche.experiments.BanditRealWorldRewards" => BanditRealWorldRewards.run()
-    case "com.edouardfouche.experiments.BanditScalabilityK" => BanditScalabilityK.run()
-    case "com.edouardfouche.experiments.BanditScalabilityT" => BanditScalabilityT.run()
-    // Those are new experiments
-    case "com.edouardfouche.experiments.BanditStaticScalingStrategies" => BanditStaticScalingStrategies.run()
-    case "com.edouardfouche.experiments.BanditStaticK" => BanditStaticK.run()
-    case "com.edouardfouche.experiments.BanditStaticOptimistic" => BanditStaticOptimistic.run()
-    case "com.edouardfouche.experiments.BanditStaticGenerators" => BanditStaticGenerators.run()
-
+    case "com.edouardfouche.experiments.BanditRealWorld_New" => BanditRealWorld_New.run()
     case _ => throw new Error(s"Unknown experiment $arg")
   }
 

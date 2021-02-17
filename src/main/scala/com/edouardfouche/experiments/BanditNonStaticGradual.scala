@@ -51,23 +51,23 @@ object BanditNonStaticGradual extends BanditSyntheticExperiment {
     MPKLUCB, MPKLUCBPLUS,
     Exp3M,
     MPTS, IMPTS, MPOTS,
-    MPDTS(0.7)(_,_,_,_), MPDTS(0.8)(_,_,_,_), MPDTS(0.9)(_,_,_,_), MPDTS(0.99)(_,_,_,_),
-    MPEGreedy(0.7)(_, _, _, _), MPEGreedy(0.8)(_, _, _, _), MPEGreedy(0.9)(_, _, _, _), MPEGreedy(0.99)(_, _, _, _),
-    MPSWUCB(50)(_, _, _, _), MPSWUCB(100)(_, _, _, _), MPSWUCB(500)(_, _, _, _), MPSWUCB(1000)(_, _, _, _),
+    MP_D_TS(0.7)(_,_,_,_), MP_D_TS(0.8)(_,_,_,_), MP_D_TS(0.9)(_,_,_,_), MP_D_TS(0.99)(_,_,_,_),
+    MP_E_Greedy(0.7)(_, _, _, _), MP_E_Greedy(0.8)(_, _, _, _), MP_E_Greedy(0.9)(_, _, _, _), MP_E_Greedy(0.99)(_, _, _, _),
+    MP_SW_UCB(50)(_, _, _, _), MP_SW_UCB(100)(_, _, _, _), MP_SW_UCB(500)(_, _, _, _), MP_SW_UCB(1000)(_, _, _, _),
 
     //OracleStatic_ADWIN(0.1)(_,_,_,_), OracleDynamic_ADWIN(0.1)(_,_,_,_), OracleSequential_ADWIN(0.1)(_,_,_,_),
 
-    CUCB_ADWIN(0.1)(_,_,_,_),
-    MPKLUCB_ADWIN(0.1)(_,_,_,_),
+    MP_AW_UCB(0.1)(_,_,_,_),
+    MP_AW_KL_UCB(0.1)(_,_,_,_),
     //OracleRandom_ADWIN(0.1)(_,_,_,_),
     Exp3M_ADWIN(0.1)(_,_,_,_),
-    MPTS_ADWIN(0.1)(_,_,_,_),
+    MP_AW_TS(0.1)(_,_,_,_),
 
-    MPTS_ADWIN(0.5)(_,_,_,_),
-    MPTS_ADWIN(0.3)(_,_,_,_),
-    MPTS_ADWIN(1)(_,_,_,_),
-    MPTS_ADWIN(0.01)(_,_,_,_),
-    MPTS_ADWIN(0.001)(_,_,_,_)
+    MP_AW_TS(0.5)(_,_,_,_),
+    MP_AW_TS(0.3)(_,_,_,_),
+    MP_AW_TS(1)(_,_,_,_),
+    MP_AW_TS(0.01)(_,_,_,_),
+    MP_AW_TS(0.001)(_,_,_,_)
   )
 
 
@@ -77,14 +77,14 @@ object BanditNonStaticGradual extends BanditSyntheticExperiment {
     MPKLUCB,
     Exp3Mauto,
     MPTS,// IMPTS, MPOTS,
-    MPDTS(0.8)(_,_,_,_), MPDTS(0.9)(_,_,_,_), MPDTS(0.99)(_,_,_,_),
-    MPEGreedy(0.8)(_, _, _, _), MPEGreedy(0.9)(_, _, _, _), MPEGreedy(0.99)(_, _, _, _),
-    MPSWUCB(100)(_, _, _, _), MPSWUCB(1000)(_, _, _, _), MPSWUCB(10000)(_, _, _, _),
+    MP_D_TS(0.8)(_,_,_,_), MP_D_TS(0.9)(_,_,_,_), MP_D_TS(0.99)(_,_,_,_),
+    MP_E_Greedy(0.8)(_, _, _, _), MP_E_Greedy(0.9)(_, _, _, _), MP_E_Greedy(0.99)(_, _, _, _),
+    MP_SW_UCB(100)(_, _, _, _), MP_SW_UCB(1000)(_, _, _, _), MP_SW_UCB(10000)(_, _, _, _),
 
-    CUCB_ADWIN(0.1)(_,_,_,_),
-    MPKLUCB_ADWIN(0.1)(_,_,_,_),
+    MP_AW_UCB(0.1)(_,_,_,_),
+    MP_AW_KL_UCB(0.1)(_,_,_,_),
     Exp3Mauto_ADWIN(0.1)(_,_,_,_),
-    MPTS_ADWIN(0.1)(_,_,_,_)
+    MP_AW_TS(0.1)(_,_,_,_)
   )
   */
 }

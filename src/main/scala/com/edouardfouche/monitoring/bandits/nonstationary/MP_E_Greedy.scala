@@ -17,10 +17,10 @@ import com.edouardfouche.streamsimulator.Simulator
   *
   * @note This approach is kind of non-static because the epsilon does not vanish, however, weights are not discounted
   */
-case class MPEGreedy(epsilon: Double)(val stream: Simulator, val reward: Reward, val scalingstrategy: ScalingStrategy, var k: Int) extends Bandit {
+case class MP_E_Greedy(epsilon: Double)(val stream: Simulator, val reward: Reward, val scalingstrategy: ScalingStrategy, var k: Int) extends Bandit {
   require((0 <= epsilon) & (epsilon <= 1)) // epsilon = 0 is like a random oracle while epsilon = 1 is completely greedy
 
-  val name = s"MP-EG; e=$epsilon"
+  val name = s"MP-E-G; e=$epsilon"
 
   def next: (Array[(Int, Int)], Array[Double], Double) = {
     var sortedindexes = sums.zip(counts).zipWithIndex.sortBy(x => - x._1._1 / x._1._2).map(_._2)

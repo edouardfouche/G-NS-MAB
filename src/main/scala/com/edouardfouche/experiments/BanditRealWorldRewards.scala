@@ -18,7 +18,7 @@ package com.edouardfouche.experiments
 
 import breeze.linalg
 import com.edouardfouche.experiments.Data.bioliq_1wx20_MI_1000_100
-import com.edouardfouche.monitoring.bandits.nonstationary.MPTS_ADWIN
+import com.edouardfouche.monitoring.bandits.nonstationary.MP_AW_TS
 import com.edouardfouche.monitoring.bandits.oracles._
 import com.edouardfouche.monitoring.rewards.AbsoluteThreshold
 import com.edouardfouche.monitoring.scalingstrategies.{KLBasedScaling, NoScaling, ScalingStrategy}
@@ -69,7 +69,7 @@ object BanditRealWorldRewards extends BanditExperiment {
 
     OracleStatic_ADWIN(0.1)(_,_,_,_), OracleDynamic_ADWIN(0.1)(_,_,_,_), OracleRandom_ADWIN(0.1)(_,_,_,_),
 
-    MPTS_ADWIN(0.1)(_,_,_,_)
+    MP_AW_TS(0.1)(_,_,_,_)
   )
 
   def run(): Unit = {

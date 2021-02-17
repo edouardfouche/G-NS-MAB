@@ -44,7 +44,7 @@ object BanditKomiyama extends BanditExperiment {
     MPKLUCB, MPKLUCBPLUS,
     //Exp3M(0.1)(_, _, _, _), Exp3M(0.3)(_, _, _, _), Exp3M(0.5)(_, _, _, _), Exp3M(0.7)(_, _, _, _), Exp3M.apply(0.9)(_, _, _, _),
     Exp3M,
-    IMPTS, MPTS, MPOTS//, MPEGreedy(1)(_, _, _, _), MPEGreedy(0.95)(_, _, _, _), MPEGreedy(0.9)(_, _, _, _), MPEGreedy(0.8)(_, _, _, _), MPEGreedy(0.7)(_, _, _, _)
+    IMPTS, MPTS, MPOTS//, MP_E_Greedy(1)(_, _, _, _), MP_E_Greedy(0.95)(_, _, _, _), MP_E_Greedy(0.9)(_, _, _, _), MP_E_Greedy(0.8)(_, _, _, _), MP_E_Greedy(0.7)(_, _, _, _)
     )
 
   def run(): Unit = {

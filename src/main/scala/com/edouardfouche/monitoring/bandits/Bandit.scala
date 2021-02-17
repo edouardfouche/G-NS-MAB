@@ -50,6 +50,7 @@ trait Bandit extends LazyLogging {
   val initial_k: Int = k
   var sums: Array[Double] = (0 until narms).map(_ => initializationvalue).toArray // Initialization the weights to maximal gain forces to exploration at the early phase
   var counts: Array[Double] = sums.map(_ => initializationvalue)
+  var tarms: Array[Double] = sums.map(_ => initializationvalue)
   var t: Double = initializationvalue
 
   /**

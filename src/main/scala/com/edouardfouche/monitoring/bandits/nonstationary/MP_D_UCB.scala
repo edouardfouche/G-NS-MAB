@@ -15,10 +15,10 @@ import com.edouardfouche.streamsimulator.Simulator
   * @param scalingstrategy the scaling strategy, which decides how many arms to pull for the next step
   * @param k the initial number of pull per round
   */
-case class MPDUCB(gamma: Double)(val stream: Simulator, val reward: Reward, val scalingstrategy: ScalingStrategy, var k: Int) extends Bandit {
+case class MP_D_UCB(gamma: Double)(val stream: Simulator, val reward: Reward, val scalingstrategy: ScalingStrategy, var k: Int) extends Bandit {
   require((0 <= gamma) & (gamma <= 1.0))
 
-  val name = s"MP-DUCB; g=$gamma"
+  val name = s"MP-D-UCB; g=$gamma"
 
   val logfactor: Double = 3.0/2.0 // or 1.0 / 2.0 ?
 

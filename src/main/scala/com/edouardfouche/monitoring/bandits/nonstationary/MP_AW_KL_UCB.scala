@@ -1,27 +1,35 @@
 package com.edouardfouche.monitoring.bandits.nonstationary
 
-import com.edouardfouche.monitoring.bandits.{BanditAdwin, BanditUCB}
+import com.edouardfouche.monitoring.bandits.{BanditAdwin, BanditKLUCB}
 import com.edouardfouche.monitoring.rewards.Reward
 import com.edouardfouche.monitoring.scalingstrategies.ScalingStrategy
 import com.edouardfouche.streamsimulator.Simulator
 
 /**
-  * CUCB as described in "Combinatorial Multi-Armed BanditK: General Framework, Results and Applications" (Chen2013)
-  * This version is combined with ADWIN
+  * KL-UCB with multiple plays and combined to ADWIN
+  * This is an extension of KL-UCB "Kullback-leibler upper confidence bounds for optimal sequential allocation" (Cappé2013)
+  * as described in "Optimal Regret Analysis of Thompson Sampling in Stochastic Multi-armed Bandit Problem with Multiple Plays" (Komiyama2016)
   *
   * @param delta the parameter for ADWIN (upper bound for the false positive rate)
   * @param stream a stream simulator on which we let this bandit run
   * @param reward the reward function which derives the gains for each action
   * @param scalingstrategy the scaling strategy, which decides how many arms to pull for the next step
   * @param k the initial number of pull per round
+  *
+  * @note As proposed in Garivier2011, the constant c is set to 0. (better empirical results)
+  * @note This is basically the same as C-KL-UCB in "Thompson Sampling for Combinatorial Semi-Bandits" (Wang2018)
+  * @note The implementation is based on https://github.com/jkomiyama/multiplaybanditlib/blob/master/policy/policy_klucb.hpp
   */
-case class CUCB_ADWIN(delta: Double)(val stream: Simulator, val reward: Reward, val scalingstrategy: ScalingStrategy, var k: Int) extends BanditAdwin with BanditUCB {
-  val name = s"CUCB-ADWIN-$delta"
+case class MP_AW_KL_UCB(delta: Double)(val stream: Simulator, val reward: Reward,
+                                       val scalingstrategy: ScalingStrategy, var k: Int) extends BanditKLUCB with BanditAdwin {
+  val name = s"MP-AW-KL-UCB; d=$delta"
 
   def next: (Array[(Int, Int)], Array[Double], Double) = {
-    val confidences = counts.map(x => if(t==0.0 | x == 0.0) 0 else math.sqrt((logfactor*math.log(t))/x))
-    val upperconfidences = sums.zip(counts).zip(confidences).map(x => (x._1._1 / x._1._2) + x._2)//.min(1.0))
-    val indexes = upperconfidences.zipWithIndex.sortBy(-_._1).map(_._2).take(k)
+    // Here I thought about replacing t by the sum of all the draws, it turned out that the results were slightly worse (tried on scenario1 and 2 from JK).
+    val klindices:Array[(Int,Double)] = (0 until narms).map(x => if(t==0.0 | counts(x) == 0.0) (x,1.0) else (x,getKLUCBupper(x,t))).toArray
+
+    val indexes = klindices.sortBy(-_._2).map(_._1).take(k)
+
     val arms = indexes.map(combinations(_))
 
     val newValues = stream.nextAndCompute(indexes)
@@ -29,6 +37,7 @@ case class CUCB_ADWIN(delta: Double)(val stream: Simulator, val reward: Reward, 
 
     val updates = scala.collection.mutable.Map[Int, Double]()
 
+    // Update the current Matrix, compute the gains and update the weights at the same time
     val gains = (indexes zip newValues).map(x => {
       val d = reward.getReward(x._2, currentMatrix(x._1))
       currentMatrix(x._1) = x._2 // replace
@@ -59,15 +68,15 @@ case class CUCB_ADWIN(delta: Double)(val stream: Simulator, val reward: Reward, 
         val rollback = history.head
         history = history.tail
         for((key,value) <- rollback) {
-          sums(key) = sums(key) - value
-          counts(key) = counts(key) - 1
+          sums(key) = sums(key) - value // if(counts(key) == 1.0) 1.0 else weights(key) - (1.0/(counts(key)-1.0))*(value._1 - weights(key))
+          counts(key) = counts(key) - 1 //- value._2
         }
       }
     }
     t = history.length + 1 // The time context is the same as the history, which is the same as the smallest window
 
-    (arms, gains, gains.sum)
+    val gain = gains.sum
+    (arms, gains, gain)
   }
-
 
 }

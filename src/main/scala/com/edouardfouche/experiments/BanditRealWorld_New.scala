@@ -18,8 +18,8 @@ package com.edouardfouche.experiments
 
 import breeze.linalg
 import com.edouardfouche.experiments.Data._
-import com.edouardfouche.monitoring.bandits.nonstationary.{MP_AW_UCB, MP_AW_KL_UCB, MP_AW_TS}
 import com.edouardfouche.monitoring.bandits.adversarial._
+import com.edouardfouche.monitoring.bandits.nonstationary.{MP_AWR_TS, MP_AW_KL_UCB, MP_AW_TS, MP_AW_UCB, MP_GLR_KL_UCB_G, MP_GLR_KL_UCB_L, MP_SW_UCB_SHARP_A}
 import com.edouardfouche.monitoring.bandits.oracles._
 import com.edouardfouche.monitoring.bandits.stationary._
 import com.edouardfouche.monitoring.rewards.AbsoluteThreshold
@@ -31,7 +31,7 @@ import com.edouardfouche.streamsimulator.CachedStreamSimulator
   * Created by fouchee on 12.07.17.
   * This experiment compares the behavior of various bandits against real-world data (see Paper)
   */
-object BanditRealWorld extends BanditExperiment {
+object BanditRealWorld_New extends BanditExperiment {
   val attributes = List("bandit","dataset","scalingstrategy","k","gain","cputime", "iteration")
 
   val data: DataRef = bioliq_1wx20_MI_1000_100
@@ -46,21 +46,10 @@ object BanditRealWorld extends BanditExperiment {
   //val nRep = 1
 
   val scalingstrategies: Array[ScalingStrategy] = Array(
-    KLBasedScaling(lmin, lmax, 0.1),
-    KLBasedScaling(lmin, lmax, 0.2),
-    KLBasedScaling(lmin, lmax, 0.3),
-    KLBasedScaling(lmin, lmax, 0.4),
-    KLBasedScaling(lmin, lmax, 0.5),
-    KLBasedScaling(lmin, lmax, 0.6),
-    KLBasedScaling(lmin, lmax, 0.7),
-    KLBasedScaling(lmin, lmax, 0.8),
-    KLBasedScaling(lmin, lmax, 0.9),
-    NoScaling((streamsimulator.npairs*(1.0/10.0)).toInt),
-    NoScaling((streamsimulator.npairs*(1.0/5.0)).toInt),
-    NoScaling((streamsimulator.npairs*(1.0/4.0)).toInt),
-    NoScaling((streamsimulator.npairs*(1.0/3.0)).toInt),
-    NoScaling((streamsimulator.npairs*(1.0/2.0)).toInt),
-    NoScaling(streamsimulator.npairs.toInt)
+    NoScaling(10),
+    NoScaling(5),
+    //NoScaling(2),
+    NoScaling(1) // do the multiple-play later
   )
 
   val banditConstructors = Vector(
@@ -68,21 +57,39 @@ object BanditRealWorld extends BanditExperiment {
     OracleStatic,
     OracleRandom,
     //OracleSequential,
-    CUCB, CUCBm,
-    MPKLUCB, MPKLUCBPLUS,
-    Exp3M,
-    MPTS, IMPTS, MPOTS,
+    //CUCB, CUCBm,
+    //MPKLUCB, MPKLUCBPLUS,
+    //Exp3M,
+    MPTS,//, IMPTS, MPOTS,
     //MP_D_TS(0.7)(_,_,_,_), MP_D_TS(0.8)(_,_,_,_), MP_D_TS(0.9)(_,_,_,_), MP_D_TS(0.99)(_,_,_,_),
     //MP_E_Greedy(0.7)(_, _, _, _), MP_E_Greedy(0.8)(_, _, _, _), MP_E_Greedy(0.9)(_, _, _, _), MP_E_Greedy(0.99)(_, _, _, _),
     //MP_SW_UCB(50)(_, _, _, _), MP_SW_UCB(100)(_, _, _, _), MP_SW_UCB(500)(_, _, _, _), MP_SW_UCB(1000)(_, _, _, _),
 
-    OracleStatic_ADWIN(0.1)(_,_,_,_), OracleDynamic_ADWIN(0.1)(_,_,_,_), OracleRandom_ADWIN(0.1)(_,_,_,_),
+    //OracleStatic_ADWIN(0.1)(_,_,_,_), OracleDynamic_ADWIN(0.1)(_,_,_,_), OracleRandom_ADWIN(0.1)(_,_,_,_),
     //OracleSequential_ADWIN(0.1)(_,_,_,_),
 
-    MP_AW_UCB(0.1)(_,_,_,_),
-    MP_AW_KL_UCB(0.1)(_,_,_,_),
-    Exp3M_ADWIN(0.1)(_,_,_,_),
-    MP_AW_TS(0.1)(_,_,_,_)
+    //MP_AW_UCB(0.1)(_,_,_,_),
+    //MP_AW_KL_UCB(0.1)(_,_,_,_),
+    //Exp3M_ADWIN(0.1)(_,_,_,_),
+    MP_AW_TS(0.1)(_,_,_,_),
+    MP_AWR_TS(0.1)(_,_,_,_),
+    MP_AW_TS(0.01)(_,_,_,_),
+    MP_AWR_TS(0.01)(_,_,_,_),
+    MP_AW_TS(0.001)(_,_,_,_),
+    MP_AWR_TS(0.001)(_,_,_,_),
+
+    MP_GLR_KL_UCB_G(_,_,_,_),
+    MP_GLR_KL_UCB_L(_,_,_,_),
+
+    MP_SW_UCB_SHARP_A(0.1, 12.3)(_,_,_,_),
+    MP_SW_UCB_SHARP_A(0.1, 4.3)(_,_,_,_),
+    MP_SW_UCB_SHARP_A(0.2, 12.3)(_,_,_,_),
+    MP_SW_UCB_SHARP_A(0.2, 4.3)(_,_,_,_),
+
+    MP_RExp3(500)(_,_,_,_),
+    MP_RExp3(1000)(_,_,_,_),
+    MP_RExp3(2000)(_,_,_,_),
+    MP_RExp3(5000)(_,_,_,_),
 
     //MP_AW_TS(0.5)(_,_,_,_),
     //MP_AW_TS(0.3)(_,_,_,_),
@@ -102,7 +109,7 @@ object BanditRealWorld extends BanditExperiment {
     info(s"nRep: ${nRep}")
 
     for {
-      scalingstrategy <- scalingstrategies.par
+      scalingstrategy <- scalingstrategies//.par
     } {
       for{
         banditConstructor <- banditConstructors.par
@@ -143,11 +150,7 @@ object BanditRealWorld extends BanditExperiment {
           summary.write(summaryPath)
         }
       }
-
-      }
-
-
-
+    }
     info(s"End of experiment ${this.getClass.getSimpleName} - ${formatter.format(java.util.Calendar.getInstance().getTime)}")
   }
 }

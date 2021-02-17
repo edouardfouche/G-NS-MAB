@@ -45,8 +45,8 @@ trait BanditExperiment extends LazyLogging {
   val deterministicBanditConstructors = Vector(
     OracleStatic, OracleDynamic, OracleWorst, OracleSequential,
     CUCB,CUCBm,
-    MPSWUCB(10)(_, _, _, _), MPSWUCB(100)(_, _, _, _), MPSWUCB(1000)(_, _, _, _), MPSWUCB(10000)(_, _, _, _),
-    MPDUCB(0.8)(_, _, _, _), MPDUCB(0.9)(_, _, _, _), MPDUCB(0.99)(_, _, _, _), MPDUCB(0.999)(_, _, _, _),  MPDUCB(1)(_, _, _, _),
+    MP_SW_UCB(10)(_, _, _, _), MP_SW_UCB(100)(_, _, _, _), MP_SW_UCB(1000)(_, _, _, _), MP_SW_UCB(10000)(_, _, _, _),
+    MP_D_UCB(0.8)(_, _, _, _), MP_D_UCB(0.9)(_, _, _, _), MP_D_UCB(0.99)(_, _, _, _), MP_D_UCB(0.999)(_, _, _, _),  MP_D_UCB(1)(_, _, _, _),
     MPKLUCB
   )
 
@@ -55,8 +55,8 @@ trait BanditExperiment extends LazyLogging {
     Exp3M(0.1)(_, _, _, _), Exp3M(0.3)(_, _, _, _), Exp3M(0.5)(_, _, _, _), Exp3M(0.7)(_, _, _, _), Exp3M.apply(0.9)(_, _, _, _),
     Exp3Mauto,
     IMPTS,
-    MPEGreedy(0.8)(_, _, _, _), MPEGreedy(0.9)(_, _, _, _), MPEGreedy(0.99)(_, _, _, _), MPEGreedy(0.999)(_, _, _, _), MPEGreedy(1)(_, _, _, _),
-    MPDTS(0.8)(_, _, _, _), MPDTS(0.9)(_, _, _, _), MPDTS(0.99)(_, _, _, _), MPDTS(0.999)(_, _, _, _), MPDTS(1)(_, _, _, _),
+    MP_E_Greedy(0.8)(_, _, _, _), MP_E_Greedy(0.9)(_, _, _, _), MP_E_Greedy(0.99)(_, _, _, _), MP_E_Greedy(0.999)(_, _, _, _), MP_E_Greedy(1)(_, _, _, _),
+    MP_D_TS(0.8)(_, _, _, _), MP_D_TS(0.9)(_, _, _, _), MP_D_TS(0.99)(_, _, _, _), MP_D_TS(0.999)(_, _, _, _), MP_D_TS(1)(_, _, _, _),
     MPOTS,
     MPTS)
   */

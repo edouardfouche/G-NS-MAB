@@ -15,12 +15,11 @@ import com.edouardfouche.streamsimulator.Simulator
   * @param scalingstrategy the scaling strategy, which decides how many arms to pull for the next step
   * @param k the initial number of pull per round
   *
-  * @note Can be seen as an adaptation from "On Upper-Confidence Bound Policies for Switching Bandit Problems" (Garivier2011)
   */
-case class MPSWUCB(windowsize: Int)(val stream: Simulator, val reward: Reward, val scalingstrategy: ScalingStrategy, var k: Int) extends BanditUCB {
+case class MP_SW_UCB(windowsize: Int)(val stream: Simulator, val reward: Reward, val scalingstrategy: ScalingStrategy, var k: Int) extends BanditUCB {
   require(windowsize > 1)
 
-  val name = s"MP-SWUCB; w=$windowsize"
+  val name = s"MP-SW-UCB; w=$windowsize"
 
   var sumsbuffer: Array[Array[Double]] = (0 until narms).map(x => (0 to windowsize).toArray.map(y => 0.0)).toArray
   var countsbuffer: Array[Array[Double]] = (0 until narms).map(x => (0 to windowsize).toArray.map(y => 0.0)).toArray
@@ -33,7 +32,6 @@ case class MPSWUCB(windowsize: Int)(val stream: Simulator, val reward: Reward, v
 
   // return a vector a 2-tuples (arms) and a gain
   def next: (Array[(Int, Int)], Array[Double], Double) = {
-    //TODO: In that case I am actually not sure whether I should replace t by the sum of all the pulls
     val confidences = counts.map(x => if(t==0.0 | x == 0.0) 0 else math.sqrt((logfactor*math.log(t.min(windowsize)))/x))
 
     val upperconfidences = sums.zip(counts).zip(confidences).map(x => (x._1._1/x._1._2)+ x._2)//.min(1.0))
