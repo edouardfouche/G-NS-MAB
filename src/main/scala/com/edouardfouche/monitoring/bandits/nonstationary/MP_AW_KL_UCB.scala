@@ -1,5 +1,6 @@
 package com.edouardfouche.monitoring.bandits.nonstationary
 
+import breeze.stats.distributions.Gaussian
 import com.edouardfouche.monitoring.bandits.{BanditAdwin, BanditKLUCB}
 import com.edouardfouche.monitoring.rewards.Reward
 import com.edouardfouche.monitoring.scalingstrategies.ScalingStrategy
@@ -25,8 +26,9 @@ case class MP_AW_KL_UCB(delta: Double)(val stream: Simulator, val reward: Reward
   val name = s"MP-AW-KL-UCB; d=$delta"
 
   def next: (Array[(Int, Int)], Array[Double], Double) = {
-    // Here I thought about replacing t by the sum of all the draws, it turned out that the results were slightly worse (tried on scenario1 and 2 from JK).
-    val klindices:Array[(Int,Double)] = (0 until narms).map(x => if(t==0.0 | counts(x) == 0.0) (x,1.0) else (x,getKLUCBupper(x,t))).toArray
+    val klindices:Array[(Int,Double)] = (0 until narms).map(x =>
+      if(t==0.0 | counts(x) == 0.0) (x,1.0+Gaussian(0, 1).draw()*0.000001)
+      else (x,getKLUCBupper(x,t) +Gaussian(0, 1).draw()*0.000001)).toArray
 
     val indexes = klindices.sortBy(-_._2).map(_._1).take(k)
 

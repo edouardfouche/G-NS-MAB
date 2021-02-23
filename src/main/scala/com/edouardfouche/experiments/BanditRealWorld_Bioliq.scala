@@ -19,7 +19,7 @@ package com.edouardfouche.experiments
 import breeze.linalg
 import com.edouardfouche.experiments.Data._
 import com.edouardfouche.monitoring.bandits.adversarial._
-import com.edouardfouche.monitoring.bandits.nonstationary.{MP_AWR_TS, MP_AW_KL_UCB, MP_AW_TS, MP_AW_UCB, MP_GLR_KL_UCB_G, MP_GLR_KL_UCB_L, MP_SW_UCB_SHARP_A}
+import com.edouardfouche.monitoring.bandits.nonstationary.{MP_AWR_Elimination_UCB, MP_AWR_TS, MP_AW_KL_UCB, MP_AW_TS, MP_AW_UCB, MP_GLR_KL_UCB_G, MP_GLR_KL_UCB_L, MP_SW_UCB_SHARP_A}
 import com.edouardfouche.monitoring.bandits.oracles._
 import com.edouardfouche.monitoring.bandits.stationary._
 import com.edouardfouche.monitoring.rewards.AbsoluteThreshold
@@ -31,7 +31,7 @@ import com.edouardfouche.streamsimulator.CachedStreamSimulator
   * Created by fouchee on 12.07.17.
   * This experiment compares the behavior of various bandits against real-world data (see Paper)
   */
-object BanditRealWorld_New extends BanditExperiment {
+object BanditRealWorld_Bioliq extends BanditExperiment {
   val attributes = List("bandit","dataset","scalingstrategy","k","gain","cputime", "iteration")
 
   val data: DataRef = bioliq_1wx20_MI_1000_100
@@ -46,10 +46,10 @@ object BanditRealWorld_New extends BanditExperiment {
   //val nRep = 1
 
   val scalingstrategies: Array[ScalingStrategy] = Array(
-    NoScaling(10),
+    //NoScaling(10),
     NoScaling(5),
-    //NoScaling(2),
-    NoScaling(1) // do the multiple-play later
+    NoScaling(2),
+    NoScaling(1)
   )
 
   val banditConstructors = Vector(
@@ -72,11 +72,16 @@ object BanditRealWorld_New extends BanditExperiment {
     //MP_AW_KL_UCB(0.1)(_,_,_,_),
     //Exp3M_ADWIN(0.1)(_,_,_,_),
     MP_AW_TS(0.1)(_,_,_,_),
-    MP_AWR_TS(0.1)(_,_,_,_),
     MP_AW_TS(0.01)(_,_,_,_),
-    MP_AWR_TS(0.01)(_,_,_,_),
     MP_AW_TS(0.001)(_,_,_,_),
+
+    MP_AWR_TS(0.1)(_,_,_,_),
+    MP_AWR_TS(0.01)(_,_,_,_),
     MP_AWR_TS(0.001)(_,_,_,_),
+
+    MP_AWR_Elimination_UCB(0.1)(_,_,_,_),
+    MP_AWR_Elimination_UCB(0.01)(_,_,_,_),
+    MP_AWR_Elimination_UCB(0.001)(_,_,_,_),
 
     MP_GLR_KL_UCB_G(_,_,_,_),
     MP_GLR_KL_UCB_L(_,_,_,_),

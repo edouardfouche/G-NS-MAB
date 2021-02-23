@@ -1,5 +1,6 @@
 package com.edouardfouche.monitoring.bandits.nonstationary
 
+import breeze.stats.distributions.Gaussian
 import com.edouardfouche.monitoring.bandits.BanditKLUCB
 import com.edouardfouche.monitoring.rewards.Reward
 import com.edouardfouche.monitoring.scalingstrategies.ScalingStrategy
@@ -36,7 +37,9 @@ case class MP_GLR_KL_UCB_G(val stream: Simulator, val reward: Reward, val scalin
 
   def next: (Array[(Int, Int)], Array[Double], Double) = {
     // Note that it is different from standard KL-UCB as the time is individual for each arm (tarms)
-    val klindices: Array[(Int, Double)] = (0 until narms).map(x => if (tarms(x) == 0 | counts(x) == 0.0) (x, 1.0) else (x, getKLUCBupper(x, tarms(x)))).toArray
+    val klindices: Array[(Int, Double)] = (0 until narms).map(x =>
+      if (tarms(x) == 0 | counts(x) == 0.0) (x, 1.0+Gaussian(0, 1).draw()*0.000001)
+      else (x, getKLUCBupper(x, tarms(x))+Gaussian(0, 1).draw()*0.000001)).toArray
 
     alpha = math.sqrt(nepisodes*narms* math.log(horizon)/horizon)
 
@@ -70,13 +73,13 @@ case class MP_GLR_KL_UCB_G(val stream: Simulator, val reward: Reward, val scalin
 
     k = scalingstrategy.scale(gains, indexes, sums, counts, t)
 
-    if(((t-1) % deltat == 0) && (t >= deltat)) { // Try to detect changes only every deltat time steps
-      (0 until narms).foreach { x =>
+    (0 until narms).foreach { x =>
+      if(((historyarm(x).length-1) % deltat == 0) && (historyarm(x).length >= deltat)) {
         val ncheck = math.floor(historyarm(x).length / deltas).toInt-1 // This is the number of window pairs we are going to check
         val beta: Double = math.log(math.pow(historyarm(x).length,(3/2))/delta)
         var glr:Double = 0.0
-        for(x <- 1 to ncheck) {
-          val s = x*deltas // number of points in first window
+        for(y <- 1 to ncheck) {
+          val s = y*deltas // number of points in first window
           val mu1 = historyarm(x).slice(0, s).sum / s
           val mu2 = historyarm(x).slice(s, historyarm(x).length).sum / (historyarm(x).length-s)
           val mu = historyarm(x).sum / historyarm(x).length

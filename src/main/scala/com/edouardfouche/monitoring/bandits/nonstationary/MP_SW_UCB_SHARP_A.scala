@@ -1,5 +1,6 @@
 package com.edouardfouche.monitoring.bandits.nonstationary
 
+import breeze.stats.distributions.Gaussian
 import com.edouardfouche.monitoring.bandits.BanditUCB
 import com.edouardfouche.monitoring.rewards.Reward
 import com.edouardfouche.monitoring.scalingstrategies.ScalingStrategy
@@ -39,7 +40,9 @@ case class MP_SW_UCB_SHARP_A(nu: Double, lambda: Double)(val stream: Simulator, 
   def next: (Array[(Int, Int)], Array[Double], Double) = {
     windowsize = t.min(lambda * math.pow(t,alpha)).max(1) // compute the new windowsize
 
-    val confidences = counts.map(x => if(t==0.0 | x == 0.0) 0 else math.sqrt((logfactor*math.log(windowsize))/x))
+    val confidences = counts.map(x =>
+      if(t==0.0 | x == 0.0) (0+Gaussian(0, 1).draw()*0.000001).max(0)
+      else (math.sqrt((logfactor*math.log(windowsize))/x)+Gaussian(0, 1).draw()*0.000001).max(0))
 
     val upperconfidences = sums.zip(counts).zip(confidences).map(x => (x._1._1/x._1._2)+ x._2)//.min(1.0))
 

@@ -1,6 +1,6 @@
 package com.edouardfouche.monitoring.bandits.nonstationary
 
-import breeze.stats.distributions.Beta
+import breeze.stats.distributions.{Beta, Gaussian}
 import com.edouardfouche.monitoring.bandits.{BanditAdwin, BanditTS, BanditUCB}
 import com.edouardfouche.monitoring.resetstrategies.SharedAdwin
 import com.edouardfouche.monitoring.rewards.Reward
@@ -32,8 +32,13 @@ case class MP_AWR_Elimination_UCB(val delta: Double)(val stream: Simulator, val 
   def next: (Array[(Int, Int)], Array[Double], Double) = {
     val toexplore = (t-1).toInt % narms.toInt // k
 
-    val confidences = counts.map(x => if(t==0.0 | x == 0.0) 0 else math.sqrt((logfactor*math.log(2*math.pow(t,3)))/(2*x)))
-    val confidences_e = counts_e.map(x => if(t==0.0 | x == 0.0) 0 else math.sqrt((logfactor*math.log(2*math.pow(t,3)))/(2*x)))
+    val confidences = counts.map(x =>
+      if(t==0.0 | x == 0.0) (0+Gaussian(0, 1).draw()*0.000001).max(0)
+      else math.sqrt((logfactor*math.log(2*math.pow(t,3)))/(2*x))+Gaussian(0, 1).draw()*0.000001)
+
+    val confidences_e = counts_e.map(x =>
+      if(t==0.0 | x == 0.0) (0+Gaussian(0, 1).draw()*0.000001).max(0)
+      else math.sqrt((logfactor*math.log(2*math.pow(t,3)))/(2*x))+Gaussian(0, 1).draw()*0.000001)
 
     val upperconfidences = sums.zip(counts).zip(confidences).map(x => (x._1._1 / x._1._2) + x._2)//.min(1.0))
     val upperconfidences_e = sums_e.zip(counts_e).zip(confidences_e).map(x => (x._1._1 / x._1._2) + x._2)//.min(1.0))

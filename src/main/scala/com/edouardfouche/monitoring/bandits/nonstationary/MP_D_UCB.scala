@@ -1,5 +1,6 @@
 package com.edouardfouche.monitoring.bandits.nonstationary
 
+import breeze.stats.distributions.Gaussian
 import com.edouardfouche.monitoring.bandits.Bandit
 import com.edouardfouche.monitoring.rewards.Reward
 import com.edouardfouche.monitoring.scalingstrategies.ScalingStrategy
@@ -27,7 +28,11 @@ case class MP_D_UCB(gamma: Double)(val stream: Simulator, val reward: Reward, va
     counts.map(x => x * gamma)
     sums.map(x => x * gamma)
 
-    val confidences = counts.map(x => if(t==0.0 | x == 0.0) 0 else math.sqrt((logfactor*math.log(t))/x))
+    val confidences = counts.map(x =>
+      if(t==0.0 | x == 0.0) (0+Gaussian(0, 1).draw()*0.000001).max(0)
+      else math.sqrt((logfactor*math.log(t))/x)+Gaussian(0, 1).draw()*0.000001)
+
+
 
     val upperconfidences = sums.zip(counts).zip(confidences).map(x => (x._1._1/x._1._2)+ x._2)//.min(1.0))
 

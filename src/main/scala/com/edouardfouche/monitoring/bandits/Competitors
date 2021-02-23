@@ -6,11 +6,13 @@ MP_AW_KL_UCB
 MP_AW_TS
 MP_AWR_TS
 
-Elimination? (TODO) TODO: What is the relationship with MP_AWR_TS?
+Elimination? DONE
+
+TODO: Check results of experiments
 
 Consider to use ADWIN1/2 maybe? (No)
 
-Active methods: TODO
+Active methods:
 
 Adapt-EvE (Combines UCB with PH test, no regret bound)
 -- Hartland et al. (2007).  Change Point Detection and Meta-Bandits for Online Learning in Dynamic Environments
@@ -20,9 +22,11 @@ Change-Point Thompson Sampling (CTS) (no regret bound)
 
 CUSUM-UCB and PH-UCB (resetting, forced exploration, regret bound)
 -- Liu, F., Lee, J., and Shroff, N. B. (2018). A change-detection based framework for piecewise-stationary multi-armed bandit problem.
+TODO? (choose)
 
 M-UCB (UCB + adaptive-window based resetting method, regret bound)
 -- Cao, Y., Wen, Z., Kveton, B., and Xie, Y. (2019). Nearly optimal adaptive procedure with change detection for piecewise-stationary bandit
+TODO? (choose)
 
 GLR-klUCB (forced exploration, regret bound)
 -- Besson, L. and Kaufmann, E. (2019).  The generalized likelihood ratio test meets klucb: an improved algorithm for piece-wise non-stationary bandits
@@ -63,9 +67,9 @@ MP_E_Greedy
 
 Data:
 
-- Yahoo! Dataset:
+- Yahoo! Dataset: TODO
 \url{https://webscope.sandbox.yahoo.com/catalog.php?datatype=\%20r&did=49&guccounter=1}
 
-- zozo: \url{https://github.com/st-tech/zr-obp}
+- zozo: \url{https://github.com/st-tech/zr-obp} TODO
 
 - Bioliq
