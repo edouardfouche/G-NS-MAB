@@ -19,11 +19,11 @@ package com.edouardfouche.experiments
 import breeze.linalg
 import com.edouardfouche.experiments.Data._
 import com.edouardfouche.monitoring.bandits.adversarial._
-import com.edouardfouche.monitoring.bandits.nonstationary.{MP_AWR_Elimination_UCB, MP_AWR_TS, MP_AW_KL_UCB, MP_AW_TS, MP_AW_UCB, MP_D_TS, MP_D_UCB, MP_E_Greedy, MP_GLR_KL_UCB_G, MP_GLR_KL_UCB_L, MP_M_UCB, MP_SW_TS, MP_SW_UCB, MP_SW_UCB_SHARP_A, MP_SW_UCB_SHARP_G}
+import com.edouardfouche.monitoring.bandits.nonstationary._
 import com.edouardfouche.monitoring.bandits.oracles._
 import com.edouardfouche.monitoring.bandits.stationary._
-import com.edouardfouche.monitoring.rewards.AbsoluteThreshold
-import com.edouardfouche.monitoring.scalingstrategies.{KLBasedScaling, NoScaling, ScalingStrategy}
+import com.edouardfouche.monitoring.rewards.{AbsoluteThreshold, CurrentScore}
+import com.edouardfouche.monitoring.scalingstrategies.{NoScaling, ScalingStrategy}
 import com.edouardfouche.preprocess.DataRef
 import com.edouardfouche.streamsimulator.CachedStreamSimulator
 
@@ -31,13 +31,13 @@ import com.edouardfouche.streamsimulator.CachedStreamSimulator
   * Created by fouchee on 12.07.17.
   * This experiment compares the behavior of various bandits against real-world data (see Paper)
   */
-object BanditRealWorld_Bioliq extends BanditExperiment {
+object BanditRealWorld_Zozo extends BanditExperiment {
   val attributes = List("bandit","dataset","scalingstrategy","k","gain","cputime", "iteration")
 
-  val data: DataRef = bioliq_1wx20_MI_1000_100
+  val data: DataRef = zozo_bts_all
   val streamsimulator = CachedStreamSimulator(data)
 
-  val reward = AbsoluteThreshold(2)
+  val reward = CurrentScore()
 
   val lmin = 1
   val lmax = streamsimulator.npairs
