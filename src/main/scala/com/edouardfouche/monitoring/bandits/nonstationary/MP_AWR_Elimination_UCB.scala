@@ -15,7 +15,7 @@ import com.edouardfouche.streamsimulator.Simulator
   * @param scalingstrategy the scaling strategy, which decides how many arms to pull for the next step
   * @param k the initial number of pull per round
   */
-case class MP_AWR_Elimination_UCB(val delta: Double)(val stream: Simulator, val reward: Reward, val scalingstrategy: ScalingStrategy, var k: Int) extends BanditUCB with BanditAdwin {
+case class MP_AWR_Elimination_UCB(delta: Double)(val stream: Simulator, val reward: Reward, val scalingstrategy: ScalingStrategy, var k: Int) extends BanditUCB with BanditAdwin {
   val name = s"MP-AWR-Elimination-UCB; d=$delta"
 
   var istar: Array[Int] = (0 until narms).map(x => x).toArray // candidates of the best arms
@@ -93,7 +93,8 @@ case class MP_AWR_Elimination_UCB(val delta: Double)(val stream: Simulator, val 
     val smallest_window = windows.minBy(_._2) // this is the smallest window
 
     // Then some ADWIN instance has shrinked and we must reset.
-    if(smallest_window._2.toInt < history.length) {
+    if(smallest_window._2.toInt < history.length-1) {
+      //println(s"${name} resetting at time t=$t, smallestw=${smallest_window._2.toInt}, history.length=${history.length}")
       sharedAdwin = new SharedAdwin(stream.npairs, delta)
       history = List()
       (0 until narms).foreach { x => // reinitialize all the arms and the candidates

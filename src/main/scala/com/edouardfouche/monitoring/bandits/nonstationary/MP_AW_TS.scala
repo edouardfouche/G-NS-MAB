@@ -54,7 +54,7 @@ case class MP_AW_TS(delta: Double)(val stream: Simulator, val reward: Reward, va
     val smallest_window = windows.minBy(_._2) // this is the smallest window
 
     // Rolling back
-    if(smallest_window._2.toInt < history.length) {
+    if(smallest_window._2.toInt < history.length-1) {
       for{
         x <- smallest_window._2.toInt until history.length
       } {

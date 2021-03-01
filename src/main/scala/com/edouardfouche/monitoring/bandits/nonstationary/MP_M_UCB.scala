@@ -24,7 +24,7 @@ case class MP_M_UCB(windowsize: Int, nchanges: Int)(val stream: Simulator, val r
   require(nchanges >= 0)
 
   override val logfactor = 2
-  val name = s"MP-M-UCB; w=$windowsize, m=$nchanges"
+  val name = s"MP-M-UCB; w=$windowsize; m=$nchanges"
 
   var historyarm: Array[List[Double]] = (0 until narms).map(_ => List[Double]()).toArray
 

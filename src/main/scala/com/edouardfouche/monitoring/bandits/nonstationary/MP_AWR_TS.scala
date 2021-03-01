@@ -55,12 +55,15 @@ case class MP_AWR_TS(delta: Double)(val stream: Simulator, val reward: Reward, v
     val smallest_window = windows.minBy(_._2) // this is the smallest window
 
     // Then some ADWIN instance has shrinked and we must reset.
-    if(smallest_window._2.toInt < history.length) {
+    if(smallest_window._2.toInt < history.length-1) {
+      //println(s"${name} resetting at time t=$t, smallestw=${smallest_window._2.toInt}, history.length=${history.length}")
       sharedAdwin = new SharedAdwin(stream.npairs, delta)
       history = List()
       beta_params = (0 until narms).map(x => (1.0,1.0)).toArray
+      sums = (0 until narms).map(_ => initializationvalue).toArray // Initialization the weights to maximal gain forces to exploration at the early phase
+      counts = sums.map(_ => initializationvalue)
     }
-    t = history.length + 1 // The time context is the same as the history, which is the same as the smallest window
+    //t = history.length + 1 // The time context is the same as the history, which is the same as the smallest window
 
     (arms, gains, gains.sum)
   }
