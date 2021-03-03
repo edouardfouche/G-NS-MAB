@@ -30,7 +30,11 @@ case class OracleDynamic_ADWIN(delta: Double)(val stream: Simulator, val reward:
 
     // Update the current Matrix
     val topindexes = diffMatrix.zipWithIndex.sortBy(-_._1).map(_._2).take(k)
+    val topgains = diffMatrix.zipWithIndex.sortBy(-_._1).map(_._1).take(k)
     val toparms = topindexes.map(combinations(_))
+
+    // If some gain is negative then "discard" the round by assigning -1 reward
+    if(topgains.exists(x => x < 0)) return (toparms, topgains, -1)
 
     val updates = scala.collection.mutable.Map[Int, Double]()
 

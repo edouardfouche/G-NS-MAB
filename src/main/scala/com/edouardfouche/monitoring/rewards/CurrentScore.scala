@@ -19,9 +19,9 @@ package com.edouardfouche.monitoring.rewards
 import breeze.numerics.abs
 
 /**
-  * Simply return the absolute value of the newval as a reward
+  * Simply return the value of the newval as a reward
   */
 case class CurrentScore() extends Reward {
   val name = "Score"
-  def getReward(newval: Double, oldval:Double): Double = abs(newval)
+  def getReward(newval: Double, oldval:Double): Double = newval
 }

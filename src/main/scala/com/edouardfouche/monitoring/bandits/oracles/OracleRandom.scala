@@ -23,7 +23,12 @@ case class OracleRandom(stream: Simulator, reward: Reward, scalingstrategy: Scal
     val indexes = Random.shuffle(combinations.indices.toList).take(k).toArray
     val arms = indexes.map(combinations(_))
     val newValues = stream.nextAndCompute(indexes)
+
+    // If true then the bandit has finished, stream is exhausted
     if (newValues.isEmpty) return (Array[(Int, Int)](), Array[Double](), 0)
+    // If some gain is negative then "discard" the round by assigning -1 reward
+    val gainscheck: Array[Double] = (indexes zip newValues).map(x => reward.getReward(x._2, currentMatrix(x._1)))
+    if(gainscheck.exists(x => x < 0)) return (arms, gainscheck, -1)
 
     val gains = (indexes zip newValues).map(x => {
       val d = reward.getReward(x._2, currentMatrix(x._1))

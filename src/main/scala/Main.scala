@@ -63,6 +63,7 @@ object Main extends LazyLogging {
   }
 
   def experimentFactory(arg: String): Unit = arg match {
+    case "com.edouardfouche.experiments.BanditRealWorld_Zozo_minus" => BanditRealWorld_Zozo_minus.run()
     case "com.edouardfouche.experiments.BanditRealWorld_Zozo" => BanditRealWorld_Zozo.run()
     case "com.edouardfouche.experiments.BanditRealWorld_Bioliq" => BanditRealWorld_Bioliq.run()
     case "com.edouardfouche.experiments.BanditRealWorld_Bioliq_test" => BanditRealWorld_Bioliq_test.run()

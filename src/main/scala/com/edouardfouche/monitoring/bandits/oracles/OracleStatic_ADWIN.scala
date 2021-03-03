@@ -45,7 +45,12 @@ case class OracleStatic_ADWIN(delta: Double)(val stream: Simulator, val reward: 
     val top_arms = top_arms_hindsight.take(k)
     val top_indexes = top_indexes_hindsight.take(k)
     val newValues = stream.nextAndCompute(top_indexes)
+
+    // If true then the bandit has finished, stream is exhausted
     if (newValues.isEmpty) return (Array[(Int, Int)](), Array[Double](), 0)
+    // If some gain is negative then "discard" the round by assigning -1 reward
+    val gainscheck: Array[Double] = (top_indexes zip newValues).map(x => reward.getReward(x._2, currentMatrix(x._1)))
+    if(gainscheck.exists(x => x < 0)) return (top_arms, gainscheck, -1)
 
     val updates = scala.collection.mutable.Map[Int, Double]()
 

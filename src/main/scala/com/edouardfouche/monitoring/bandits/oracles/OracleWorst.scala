@@ -26,8 +26,13 @@ case class OracleWorst(stream: Simulator, reward: Reward, scalingstrategy: Scali
     // Find the worst-k arms
     val diffMatrix = newMatrix.zip(currentMatrix.toArray).map(x => reward.getReward(x._1, x._2))
 
-    val worstindexes = diffMatrix.zipWithIndex.sortBy(_._1).map(_._2).take(k)
+    // Update the current Matrix
+    val worstindexes = diffMatrix.zipWithIndex.sortBy(-_._1).map(_._2).take(k)
+    val worstgains = diffMatrix.zipWithIndex.sortBy(-_._1).map(_._1).take(k)
     val worstarms = worstindexes.map(combinations(_))
+
+    // If some gain is negative then "discard" the round by assigning -1 reward
+    if(worstgains.exists(x => x < 0)) return (worstarms, worstgains, -1)
 
     // Update the current Matrix
     worstindexes.foreach(x => {

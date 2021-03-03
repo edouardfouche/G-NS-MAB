@@ -59,7 +59,12 @@ case class MP_M_UCB(windowsize: Int, nchanges: Int)(val stream: Simulator, val r
     val arms = indexes.map(combinations(_))
 
     val newValues = stream.nextAndCompute(indexes)
+
+    // If true then the bandit has finished, stream is exhausted
     if (newValues.isEmpty) return (Array[(Int, Int)](), Array[Double](), 0)
+    // If some gain is negative then "discard" the round by assigning -1 reward
+    val gainscheck: Array[Double] = (indexes zip newValues).map(x => reward.getReward(x._2, currentMatrix(x._1)))
+    if(gainscheck.exists(x => x < 0)) return (arms, gainscheck, -1)
 
     // Update the current Matrix, compute the gains and update the weights at the same time
     val gains = (indexes zip newValues).map(x => {

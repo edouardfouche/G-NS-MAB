@@ -45,6 +45,12 @@ case class OracleStatic(stream: Simulator, reward: Reward, scalingstrategy: Scal
     val newValues = stream.nextAndCompute(top_indexes)
     if (newValues.isEmpty) return (Array[(Int, Int)](), Array[Double](), 0)
 
+    // If true then the bandit has finished, stream is exhausted
+    if (newValues.isEmpty) return (Array[(Int, Int)](), Array[Double](), 0)
+    // If some gain is negative then "discard" the round by assigning -1 reward
+    val gainscheck: Array[Double] = (top_indexes zip newValues).map(x => reward.getReward(x._2, currentMatrix(x._1)))
+    if(gainscheck.exists(x => x < 0)) return (top_arms, gainscheck, -1)
+
     val gains = (top_indexes zip newValues).map(x => {
       val d = reward.getReward(x._2, currentMatrix(x._1))
       currentMatrix(x._1) = x._2 // replace
