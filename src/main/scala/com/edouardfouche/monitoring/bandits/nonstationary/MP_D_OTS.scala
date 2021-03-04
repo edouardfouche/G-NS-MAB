@@ -51,7 +51,7 @@ case class MP_D_OTS(gamma: Double)(val stream: Simulator, val reward: Reward, va
     })
 
     t += 1.0
-    k = scalingstrategy.scale(gains, indexes, sums, counts, t)
+    k = scalingstrategy.scale(gains, indexes, sums, counts, t.toInt)
 
     // We say the parameters cannot be lower than 0.001 because they need to be positive.
     // In some unfortunate circumstances, it might happen that rounding leads to a parameter becomes equal to 0

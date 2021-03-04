@@ -124,6 +124,8 @@ object BanditRealWorld_Zozo_minus extends BanditExperiment {
         var allgains: linalg.Vector[Double] = linalg.Vector((1 to streamsimulator.nbatches).map(x => 0.0).toArray)
         var allks: linalg.Vector[Double] = linalg.Vector((1 to streamsimulator.nbatches).map(x => 0.0).toArray)
         var allcpu: linalg.Vector[Double] = linalg.Vector((1 to streamsimulator.nbatches).map(x => 0.0).toArray)
+        var allinfocounts:  linalg.Vector[Double] = linalg.Vector((1 to streamsimulator.nbatches).map(x => 0.0).toArray)
+
 
         for {
           rep <- 0 until nRep
@@ -132,10 +134,21 @@ object BanditRealWorld_Zozo_minus extends BanditExperiment {
           val bandit = banditConstructor(streamsimulator.copy(), reward, scalingstrategy, scalingstrategy.k)
           if (rep % 10 == 0) info(s"Reached rep $rep with bandit ${bandit.name}, ${scalingstrategy.name}")
           val (gains, ks, cpu) = fullrunnerGainsKsCPU(bandit, Array[Double](), Array[Int](), Array[Double]())
-          allgains = allgains +:+ (breeze.linalg.Vector(gains) *:* (1.0/nRep))
-          allks = allks +:+ (breeze.linalg.Vector(ks.map(_.toDouble)) *:* (1.0/nRep))
-          allcpu = allcpu +:+ (breeze.linalg.Vector(cpu.map(_.toDouble)) *:* (1.0/nRep))
+
+          // This is how we handle the -1 gains, i.e., the absence of feedback.
+          val infovector: Array[Double] = gains.map(x => if(x < 0) 0.0 else 1.0)
+          val correctedgain = gains.map(x => if(x < 0) 0 else x)
+
+          allinfocounts = allinfocounts +:+ breeze.linalg.Vector(infovector)
+
+          allgains = allgains +:+ breeze.linalg.Vector(correctedgain)
+          allks = allks +:+ breeze.linalg.Vector(ks.map(_.toDouble))
+          allcpu = allcpu +:+ breeze.linalg.Vector(cpu.map(_.toDouble))
         }
+
+        allgains = allgains /:/ allinfocounts
+        allks = allks /:/ allinfocounts
+        allcpu = allcpu /:/ allinfocounts
 
         val bandit = banditConstructor(streamsimulator.copy(), reward, scalingstrategy, scalingstrategy.k)
         for{

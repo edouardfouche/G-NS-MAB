@@ -21,7 +21,7 @@ case class MP_D_UCB(gamma: Double)(val stream: Simulator, val reward: Reward, va
 
   val name = s"MP-D-UCB; g=$gamma"
 
-  val logfactor: Double = 3.0/2.0 // or 1.0 / 2.0 ?
+  val logfactor: Double = 1.0/2.0 // 3.0/2.0 // or 1.0 / 2.0 ?
 
   def next: (Array[(Int, Int)], Array[Double], Double) = {
     t = t * gamma
@@ -30,9 +30,8 @@ case class MP_D_UCB(gamma: Double)(val stream: Simulator, val reward: Reward, va
 
     val confidences = counts.map(x =>
       if(t==0.0 | x == 0.0) (0+Gaussian(0, 1).draw()*0.000001).max(0)
-      else math.sqrt((logfactor*math.log(t))/x)+Gaussian(0, 1).draw()*0.000001)
-
-
+      else 2*math.sqrt((logfactor*math.log(counts.sum))/x)+Gaussian(0, 1).draw()*0.000001) // else math.sqrt((logfactor*math.log(t))/x)+Gaussian(0, 1).draw()*0.000001)
+      //2 because of the 2B, where B is upper bound on the reward (here, 1)
 
     val upperconfidences = sums.zip(counts).zip(confidences).map(x => (x._1._1/x._1._2)+ x._2)//.min(1.0))
 

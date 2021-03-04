@@ -19,8 +19,11 @@ case class MP_AWR_Elimination_UCB(delta: Double)(val stream: Simulator, val rewa
   val name = s"MP-AWR-Elimination-UCB; d=$delta"
 
   var istar: Array[Int] = (0 until narms).map(x => x).toArray // candidates of the best arms
+  var toremove = Array[Int]()
+
   var sums_e: Array[Double] = (0 until narms).map(_ => initializationvalue).toArray // Initialization the weights to maximal gain forces to exploration at the early phase
   var counts_e: Array[Double] = sums.map(_ => initializationvalue)
+  val horizon: Int = stream.nbatches
 
   override def reset: Unit = {
     super.reset
@@ -34,14 +37,18 @@ case class MP_AWR_Elimination_UCB(delta: Double)(val stream: Simulator, val rewa
 
     val confidences = counts.map(x =>
       if(t==0.0 | x == 0.0) (0+Gaussian(0, 1).draw()*0.000001).max(0)
-      else math.sqrt((logfactor*math.log(2*math.pow(t,3)))/(2*x))+Gaussian(0, 1).draw()*0.000001)
+      else math.sqrt(math.log(math.pow(horizon,4))/(2*x))+Gaussian(0, 1).draw()*0.000001)
 
     val confidences_e = counts_e.map(x =>
       if(t==0.0 | x == 0.0) (0+Gaussian(0, 1).draw()*0.000001).max(0)
-      else math.sqrt((logfactor*math.log(2*math.pow(t,3)))/(2*x))+Gaussian(0, 1).draw()*0.000001)
+      else math.sqrt(math.log(math.pow(horizon,4))/(2*x))+Gaussian(0, 1).draw()*0.000001)
 
-    val upperconfidences = sums.zip(counts).zip(confidences).map(x => (x._1._1 / x._1._2) + x._2)//.min(1.0))
-    val upperconfidences_e = sums_e.zip(counts_e).zip(confidences_e).map(x => (x._1._1 / x._1._2) + x._2)//.min(1.0))
+    val upperconfidences = sums.zip(counts).zip(confidences).map(x =>
+      if(x._1._2 == 1) math.pow(horizon,4)+Gaussian(0, 1).draw()*0.000001 + x._2  // if never drawn since last forgetting then put a huge value
+      else (x._1._1 / x._1._2) + x._2)//.min(1.0))
+    val upperconfidences_e = sums_e.zip(counts_e).zip(confidences_e).map(x =>
+      if(x._1._2 == 1) math.pow(horizon,4)+Gaussian(0, 1).draw()*0.000001 + x._2  // if never drawn since last forgetting then put a huge value
+      else (x._1._1 / x._1._2) + x._2)//.min(1.0))
 
     val sortedindices = upperconfidences.zipWithIndex.sortBy(-_._1).map(_._2)
     val indexes: Array[Int] =  if(istar.contains(toexplore)){ // draw toexplore and the top k-1 arms
@@ -51,14 +58,12 @@ case class MP_AWR_Elimination_UCB(delta: Double)(val stream: Simulator, val rewa
     }
 
     if(istar.length > 1) { // elimination
-      val lowerconfidences_e = sums_e.zip(counts_e).zip(confidences_e).map(x => (x._1._1 / x._1._2) - x._2)//.min(1.0))
-      var toremove = List[Int]()
-      for(x <- istar) {
-        if(lowerconfidences_e.exists(y => y > confidences(x))) {
-          toremove :+ x
-        }
-      }
-      istar = istar.filter(x => !toremove.contains(x))
+      val lowerconfidences_e = sums_e.zip(counts_e).zip(confidences_e).map(x =>
+        if(x._1._2 == 1) math.pow(horizon,4)+Gaussian(0, 1).draw()*0.000001 - x._2 // if never drawn since last forgetting then put a huge value
+        else (x._1._1 / x._1._2) - x._2)//.min(1.0))
+      toremove = Array[Int]()
+      for(x <- istar) if(lowerconfidences_e.exists(y => y > upperconfidences_e(x))) toremove = toremove ++ Array(x)
+      for(x <- toremove) if(istar.length > 1) istar = istar.filter(y => y == x)
     }
 
     val arms = indexes.map(combinations(_))
