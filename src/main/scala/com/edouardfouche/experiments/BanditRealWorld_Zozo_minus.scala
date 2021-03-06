@@ -146,6 +146,7 @@ object BanditRealWorld_Zozo_minus extends BanditExperiment {
           allcpu = allcpu +:+ breeze.linalg.Vector(cpu.map(_.toDouble))
         }
 
+        allinfocounts = allinfocounts.map(x => if(x == 0) 1.0 else x) // to avoid dividing by 0
         allgains = allgains /:/ allinfocounts
         allks = allks /:/ allinfocounts
         allcpu = allcpu /:/ allinfocounts
