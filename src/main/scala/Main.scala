@@ -64,9 +64,9 @@ object Main extends LazyLogging {
 
   def experimentFactory(arg: String): Unit = arg match {
     case "com.edouardfouche.experiments.BanditSynthetic" => {
-      BanditStatic.run()
       BanditNonStaticAbrupt.run()
       BanditNonStaticGradual.run()
+      BanditStatic.run()
       BanditNonStaticGlobal.run()
     }
     case "com.edouardfouche.experiments.BanditRealWorld" => {
