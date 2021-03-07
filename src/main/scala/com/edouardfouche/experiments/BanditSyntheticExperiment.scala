@@ -100,7 +100,7 @@ trait BanditSyntheticExperiment extends BanditExperiment {
         } {
           val bandit = banditConstructor._1(simulators(rep).copy(), reward, scalingstrategy, lmax)
           val (gains, ks, cpu) = fullrunnerGainsKsCPU(bandit, Array[Double](), Array[Int](), Array[Double]())
-          if (rep % 10 == 0) info(s"Reached rep $rep with bandit ${bandit.name}, ${scalingstrategy.name}")
+          if (rep % 5 == 0) info(s"Reached rep $rep with bandit ${bandit.name}, ${scalingstrategy.name}")
           allgains = allgains +:+ (breeze.linalg.Vector(gains) *:* (1.0 / nRep))
           allks = allks +:+ (breeze.linalg.Vector(ks.map(_.toDouble)) *:* (1.0 / nRep))
           allcpu = allcpu +:+ (breeze.linalg.Vector(cpu.map(_.toDouble)) *:* (1.0 / nRep))

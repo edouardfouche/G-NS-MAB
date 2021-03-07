@@ -34,10 +34,10 @@ object BanditNonStaticGlobal extends BanditSyntheticExperiment {
 
   val generator= GlobalGenerator(d)
 
-  val nRep = 100
+  val nRep = 10
 
   val scalingstrategies: Array[ScalingStrategy] = Array(
-    NoScaling(10),
+    //NoScaling(10),
     NoScaling(5),
     NoScaling(2),
     NoScaling(1)
