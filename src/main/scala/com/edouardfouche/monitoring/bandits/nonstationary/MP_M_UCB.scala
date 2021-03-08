@@ -85,7 +85,7 @@ case class MP_M_UCB(windowsize: Int, nchanges: Int)(val stream: Simulator, val r
         val w2 = historyarm(x).slice(historyarm(x).length-windowsize,historyarm(x).length-(windowsize/2+1)+1).sum
         if(math.abs(w1-w2) > b) { // Detect a change
           changedetected = true
-          println(s"Change detected at time $t on arm $x")
+          //println(s"Change detected at time $t on arm $x")
         }
       }
     }

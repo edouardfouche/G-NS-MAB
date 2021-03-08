@@ -34,7 +34,7 @@ object BanditStatic extends BanditSyntheticExperiment {
 
   val generator= StaticGenerator(d)
 
-  val nRep = 10
+  val nRep = 5
 
   val scalingstrategies: Array[ScalingStrategy] = Array(
     //NoScaling(10),

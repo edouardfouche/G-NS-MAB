@@ -34,7 +34,7 @@ object BanditNonStaticAbrupt extends BanditSyntheticExperiment {
 
   val generator= AbruptGenerator(d)
 
-  val nRep = 10
+  val nRep = 5
 
   val scalingstrategies: Array[ScalingStrategy] = Array(
     //NoScaling(10),
