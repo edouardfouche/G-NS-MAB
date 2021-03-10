@@ -15,6 +15,13 @@ trait BanditKLUCB extends Bandit {
   def kl(p: Double, q: Double): Double = {
     p * scala.math.log(p/q) + (1-p)*scala.math.log((1-p)/(1-q))
   }
+
+  def kl_safe(x: Double,y: Double):Double = {
+    val a = if(y==0) x else x * math.log(x/y)
+    val b = if((1-y) == 0) 1-x else (1-x)*math.log((1-x)/(1-y))
+    a + b
+  }
+
   // calculate the derivative kl-divergence
   def dkl(p: Double , q: Double): Double = {
     (q-p) / (q * (1.0 - q))

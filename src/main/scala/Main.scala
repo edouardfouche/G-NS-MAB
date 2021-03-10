@@ -66,7 +66,11 @@ object Main extends LazyLogging {
     case "com.edouardfouche.experiments.BanditAbrupt" => BanditNonStaticAbrupt.run()
     case "com.edouardfouche.experiments.BanditGradual" => BanditNonStaticGradual.run()
     case "com.edouardfouche.experiments.BanditStatic" => BanditStatic.run()
-
+    case "com.edouardfouche.experiments.BanditExtra" => {
+      BanditRealWorld_Bioliq_ADWIN.run()
+      BanditRealWorld_Zozo.run()
+      BanditStatic.run()
+    }
     case "com.edouardfouche.experiments.BanditSynthetic" => {
       BanditNonStaticAbrupt.run()
       BanditNonStaticGradual.run()
@@ -81,6 +85,7 @@ object Main extends LazyLogging {
     case "com.edouardfouche.experiments.BanditRealWorld_Zozo" => BanditRealWorld_Zozo.run()
     case "com.edouardfouche.experiments.BanditRealWorld_Bioliq" => BanditRealWorld_Bioliq.run()
     case "com.edouardfouche.experiments.BanditRealWorld_Bioliq_test" => BanditRealWorld_Bioliq_test.run()
+    case "com.edouardfouche.experiments.BanditRealWorld_Bioliq_ADWIN" => BanditRealWorld_Bioliq_ADWIN.run()
     case _ => throw new Error(s"Unknown experiment $arg")
   }
 

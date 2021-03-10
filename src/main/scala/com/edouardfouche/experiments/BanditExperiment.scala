@@ -169,6 +169,20 @@ trait BanditExperiment extends LazyLogging {
   }
 
   @tailrec
+  final def fullrunnerGainsKsCPUW(bandit: BanditAdwin, gains: Array[Double], ks: Array[Int], cpu: Array[Double], historylengths: Array[Double]): (Array[Double], Array[Int], Array[Double], Array[Double]) = {
+    val k = bandit.k
+    val next = StopWatch.measureCPUTime(bandit.next)
+    val time = next._1
+    val nextresult = next._2
+
+    if(nextresult._1.isEmpty) {
+      return (gains, ks, cpu, historylengths)
+    } else {
+      fullrunnerGainsKsCPUW(bandit, gains :+ nextresult._3, ks :+ k, cpu :+ time, historylengths :+ bandit.history.length)
+    }
+  }
+
+  @tailrec
   final def fullrunnerGainsKsConfs(bandit: Bandit, gains: Array[Double], ks: Array[Int], confs: Array[Double]): (Array[Double], Array[Int], Array[Double]) = {
     val k = bandit.k
     val nextresult = bandit.next

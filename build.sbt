@@ -8,8 +8,8 @@ version := "1.0"
 scalaVersion := "2.12.8"
 fork in run := true
 
-javaOptions += "-Xmx90G"
-javaOptions += "-Xms90G"
+javaOptions += "-Xmx100G"
+javaOptions += "-Xms100G"
 //javaOptions += "-XX:-UseGCOverheadLimit" // may lead to some problems
 
 scalacOptions ++= Seq("-feature")

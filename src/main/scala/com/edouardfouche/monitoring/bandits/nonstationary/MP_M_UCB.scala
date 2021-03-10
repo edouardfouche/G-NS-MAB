@@ -7,8 +7,7 @@ import com.edouardfouche.monitoring.scalingstrategies.ScalingStrategy
 import com.edouardfouche.streamsimulator.Simulator
 
 /**
-  * Sliding-Window UCB with Multiple Plays
-  * The idea of SW-UCB comes from "On Upper-Confidence Bound Policies for Non-Stationary Bandit Problems" (Garivier2011)
+  * M-UCB
   *
   * @param windowsize size of the sliding window (must be even)
   * @param nchanges Number of changes (M in the paper)

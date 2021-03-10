@@ -6,6 +6,9 @@ import com.edouardfouche.monitoring.rewards.Reward
 import com.edouardfouche.monitoring.scalingstrategies.ScalingStrategy
 import com.edouardfouche.streamsimulator.Simulator
 
+import scala.math.random
+import scala.util.Random
+
 /**
   * KL-UCB with multiple plays and Bernoulli Generalized Likelihood Ratio Test, global
   * See Efficient Change-Point Detection for Tackling Piecewise-Stationary Bandits (Besson 2020 et al.)
@@ -20,6 +23,7 @@ import com.edouardfouche.streamsimulator.Simulator
   * GLR depends on it, as the criterion is β(n, δ) = ln(math.pow(n,(3/2))/δ)
   * There is also some massive downsampling to make the GLR test computationally OK.
   * A difference between local and global restart
+  * I think that they do not scale well. (to check)
   */
 case class MP_GLR_KL_UCB_G(val stream: Simulator, val reward: Reward, val scalingstrategy: ScalingStrategy, var k: Int) extends BanditKLUCB {
   val name = "MP-GLR-KL-UCB-G"
@@ -83,17 +87,17 @@ case class MP_GLR_KL_UCB_G(val stream: Simulator, val reward: Reward, val scalin
         val ncheck = math.floor(historyarm(x).length / deltas).toInt-1 // This is the number of window pairs we are going to check
         val beta: Double = math.log(math.pow(historyarm(x).length,(3/2))/delta)
         var glr:Double = 0.0
-        for(y <- 1 to ncheck) {
+
+        val tocheck = if(ncheck > 1000) {
+          println(s"GLR-klUCB window at time $t on arm $x is too big, limiting to 1000 (random)")
+          (1 to ncheck).toList
+        } else Random.shuffle((1 to ncheck).toList).take(1000)
+        for(y <- tocheck) {
           val s = y*deltas // number of points in first window
           val mu1 = historyarm(x).slice(0, s).sum / s
           val mu2 = historyarm(x).slice(s, historyarm(x).length).sum / (historyarm(x).length-s)
           val mu = historyarm(x).sum / historyarm(x).length
-          def kl(x: Double,y: Double):Double = {
-            val a = if(y==0) x else x * math.log(x/y)
-            val b = if((1-y) == 0) 1-x else (1-x)*math.log((1-x)/(1-y))
-            a + b
-          }
-          glr = glr.max(s*kl(mu1, mu) + (historyarm(x).length-s)*kl(mu2, mu))
+          glr = glr.max(s*kl_safe(mu1, mu) + (historyarm(x).length-s)*kl_safe(mu2, mu))
         }
         if(glr > beta) { // reinitialize all data for this arm
           changedetected = true // flag that a change was detected
