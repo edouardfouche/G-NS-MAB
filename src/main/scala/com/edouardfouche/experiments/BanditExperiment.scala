@@ -178,7 +178,7 @@ trait BanditExperiment extends LazyLogging {
     if(nextresult._1.isEmpty) {
       return (gains, ks, cpu, historylengths)
     } else {
-      fullrunnerGainsKsCPUW(bandit, gains :+ nextresult._3, ks :+ k, cpu :+ time, historylengths :+ bandit.history.length)
+      fullrunnerGainsKsCPUW(bandit, gains :+ nextresult._3, ks :+ k, cpu :+ time, historylengths :+ bandit.history.length.toDouble)
     }
   }
 
