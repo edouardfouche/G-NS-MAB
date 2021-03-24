@@ -33,7 +33,8 @@ case class GradualGenerator(d: Int = 100) extends Scenario{
     */
   def generate(rand: RandBasis =
                  new RandBasis(new ThreadLocalRandomGenerator(new MersenneTwister(scala.util.Random.nextInt)))): Array[Array[Double]] = {
-    val a = (1 to d).map(_/d.toDouble - 1/(3*d.toDouble)).toArray
+    //val a = (1 to d).map(_/d.toDouble - 1/(3*d.toDouble)).toArray
+    val a = (1 to d).map(_/d.toDouble).toArray
     val means = a.reverse
     val nevents = 60
     val eventpoints = (1 to nevents).map(_*n/(nevents.toDouble+1)).toArray

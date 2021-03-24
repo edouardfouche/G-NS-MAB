@@ -32,7 +32,7 @@ import com.edouardfouche.streamsimulator.CachedStreamSimulator
   * This experiment compares the behavior of various bandits against real-world data (see Paper)
   */
 object BanditRealWorld_Bioliq_ADWIN extends BanditExperiment {
-  val attributes = List("bandit","dataset","scalingstrategy","k","gain","cputime", "iteration")
+  val attributes = List("bandit","dataset","scalingstrategy","k","gain","cputime", "historylength", "iteration")
 
   val data: DataRef = bioliq_1wx20_MI_1000_100
   val streamsimulator = CachedStreamSimulator(data)

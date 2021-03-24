@@ -88,10 +88,10 @@ case class MP_GLR_KL_UCB_L(val stream: Simulator, val reward: Reward, val scalin
           val beta: Double = math.log(math.pow(historyarm(x).length,(3/2))/delta)
           var glr:Double = 0.0
 
-          val tocheck = if(ncheck > 1000) {
-            println(s"GLR-klUCB window at time $t on arm $x is too big, limiting to 1000 (random)")
+          val tocheck = if(ncheck > 100) {
+            //println(s"GLR-klUCB window at time $t on arm $x is too big, limiting to 1000 (random)")
             (1 to ncheck).toList
-          } else Random.shuffle((1 to ncheck).toList).take(1000)
+          } else Random.shuffle((1 to ncheck).toList).take(100)
           for(y <- tocheck) {
             val s = y*deltas // number of points in first window
             val mu1 = historyarm(x).slice(0, s).sum / s

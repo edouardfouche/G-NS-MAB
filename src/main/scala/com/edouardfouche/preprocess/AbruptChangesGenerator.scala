@@ -19,14 +19,17 @@ package com.edouardfouche.preprocess
 import breeze.stats.distributions.{Bernoulli, RandBasis, ThreadLocalRandomGenerator}
 import org.apache.commons.math3.random.MersenneTwister
 
+import scala.annotation.tailrec
+
 /**
   * ShutdownGenerator simulates a setting where the means of the tops arms at "abruptly" (i.e., at the same time) set to 0 and back
   * As in "Scaling Multi-Armed Bandit Algorithms" (Fouché 2019)
   * @param d the number of arms
   */
-case class AbruptGenerator(d: Int = 100) extends Scenario{
-  val id = s"AbruptGenerator-$d" //val J = 90 // few high-reward arms
+case class AbruptChangesGenerator(nchanges: Int = 2, d: Int = 100) extends Scenario{
+  val id = s"AbruptChangesGenerator-$nchanges-$d" //val J = 90 // few high-reward arms
   val n = 100000
+  val nphases = nchanges+1
   /**
     * generate data
     * @return A 2-D Array of Double containing the values from the csv. (row oriented)
@@ -39,16 +42,28 @@ case class AbruptGenerator(d: Int = 100) extends Scenario{
 
     val cols: Array[Array[Double]] = means.zipWithIndex.map{x =>
       val b = new Bernoulli(x._1)(rand)
-      val index = x._2
-      val partA: Array[Double] = (0 until n/3).toArray.map(y => if(b.draw()) 1.0 else 0.0)
-      val partB: Array[Double] = (0 until n/3).toArray.map{y =>
-        if(x._2 < 30) 0.0
-        else {
-          if(b.draw()) 1.0 else 0.0
+      //val index = x._2
+
+      //val partA: Array[Double] = (0 until n/nphases).toArray.map(y => if(b.draw()) 1.0 else 0.0)
+      @tailrec
+      def nextphase(i: Int, data: Array[Double]): Array[Double] = {
+        if(i==nphases) data
+        else{
+          val nelements = if(i == nphases-1) n/nphases + +n%nphases else n/nphases // consider if this is the last phase
+          val newpart = if(i%2==0) {
+            (0 until nelements).toArray.map(y => if(b.draw()) 1.0 else 0.0)
+          } else {
+            (0 until nelements).toArray.map{y =>
+              if(x._2 < 30) 0.0
+              else {
+                if(b.draw()) 1.0 else 0.0
+              }
+            }
+          }
+          nextphase(i+1, data ++ newpart)
         }
       }
-      val partC: Array[Double] = (0 until (n/3+n%3)).toArray.map(y => if(b.draw()) 1.0 else 0.0)
-      partA ++ partB ++ partC
+      nextphase(0, Array[Double]())
     }
     cols.transpose
   }
