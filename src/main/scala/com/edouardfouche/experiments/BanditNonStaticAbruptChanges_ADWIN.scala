@@ -18,11 +18,7 @@ package com.edouardfouche.experiments
 
 import breeze.linalg
 import breeze.stats.distributions.{RandBasis, ThreadLocalRandomGenerator}
-import com.edouardfouche.experiments.BanditRealWorld_Bioliq_ADWIN.{attributes, fullrunnerGainsKsCPUW, info, reward, streamsimulator, summaryPath}
-import com.edouardfouche.monitoring.bandits.adversarial._
 import com.edouardfouche.monitoring.bandits.nonstationary._
-import com.edouardfouche.monitoring.bandits.oracles.{OracleDynamic, OracleRandom, OracleStatic}
-import com.edouardfouche.monitoring.bandits.stationary._
 import com.edouardfouche.monitoring.rewards.AbsoluteThreshold
 import com.edouardfouche.monitoring.scalingstrategies._
 import com.edouardfouche.preprocess._
@@ -42,10 +38,10 @@ object BanditNonStaticAbruptChanges_ADWIN extends BanditExperiment {
   val reward = AbsoluteThreshold(1)
 
   val generators: Array[AbruptChangesGenerator] = Array(
+    AbruptChangesGenerator(1, d),
     AbruptChangesGenerator(2, d),
-    AbruptChangesGenerator(3, d),
-    AbruptChangesGenerator(4, d),
-    AbruptChangesGenerator(5, d)
+    AbruptChangesGenerator(5, d),
+    AbruptChangesGenerator(10, d)
   )
 
   val nRep = 5
@@ -100,10 +96,10 @@ object BanditNonStaticAbruptChanges_ADWIN extends BanditExperiment {
         for{
           banditConstructor <- banditConstructors.zipWithIndex.par
         } {
-          var allgains: linalg.Vector[Double] = linalg.Vector((1 to streamsimulator.nbatches).map(x => 0.0).toArray)
-          var allks: linalg.Vector[Double] = linalg.Vector((1 to streamsimulator.nbatches).map(x => 0.0).toArray)
-          var allcpu: linalg.Vector[Double] = linalg.Vector((1 to streamsimulator.nbatches).map(x => 0.0).toArray)
-          var allhistorylengths: linalg.Vector[Double] = linalg.Vector((1 to streamsimulator.nbatches).map(x => 0.0).toArray)
+          var allgains: linalg.Vector[Double] = linalg.Vector((1 to simulators(0).nbatches).map(x => 0.0).toArray)
+          var allks: linalg.Vector[Double] = linalg.Vector((1 to simulators(0).nbatches).map(x => 0.0).toArray)
+          var allcpu: linalg.Vector[Double] = linalg.Vector((1 to simulators(0).nbatches).map(x => 0.0).toArray)
+          var allhistorylengths: linalg.Vector[Double] = linalg.Vector((1 to simulators(0).nbatches).map(x => 0.0).toArray)
 
           for {
             rep <- 0 until nRep

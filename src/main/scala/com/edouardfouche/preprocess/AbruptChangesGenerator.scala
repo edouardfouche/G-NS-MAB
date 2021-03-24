@@ -40,31 +40,31 @@ case class AbruptChangesGenerator(nchanges: Int = 2, d: Int = 100) extends Scena
     val a = (1 to d).map(_/d.toDouble).toArray
     val means = a.reverse
 
-    val cols: Array[Array[Double]] = means.zipWithIndex.map{x =>
-      val b = new Bernoulli(x._1)(rand)
-      //val index = x._2
-
-      //val partA: Array[Double] = (0 until n/nphases).toArray.map(y => if(b.draw()) 1.0 else 0.0)
-      @tailrec
-      def nextphase(i: Int, data: Array[Double]): Array[Double] = {
-        if(i==nphases) data
-        else{
-          val nelements = if(i == nphases-1) n/nphases + +n%nphases else n/nphases // consider if this is the last phase
-          val newpart = if(i%2==0) {
-            (0 until nelements).toArray.map(y => if(b.draw()) 1.0 else 0.0)
-          } else {
-            (0 until nelements).toArray.map{y =>
-              if(x._2 < 30) 0.0
-              else {
-                if(b.draw()) 1.0 else 0.0
-              }
+    @tailrec
+    def nextphase(i: Int, index: Int, b: Bernoulli, data: Array[Double]): Array[Double] = {
+      if(i==nphases) data
+      else{
+        val nelements = if(i == nphases-1) n/nphases + +n%nphases else n/nphases // consider if this is the last phase
+        val newpart = if(i%2==0) {
+          (0 until nelements).toArray.map(y => if(b.draw()) 1.0 else 0.0)
+        } else {
+          (0 until nelements).toArray.map{y =>
+            if(index < 30) 0.0
+            else {
+              if(b.draw()) 1.0 else 0.0
             }
           }
-          nextphase(i+1, data ++ newpart)
         }
+        nextphase(i+1, index, b, data ++ newpart)
       }
-      nextphase(0, Array[Double]())
     }
+
+    val cols: Array[Array[Double]] = means.zipWithIndex.map{x =>
+      val b: Bernoulli = new Bernoulli(x._1)(rand)
+      val index = x._2
+      nextphase(0, index, b, Array[Double]())
+    }
+
     cols.transpose
   }
 }

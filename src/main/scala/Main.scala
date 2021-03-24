@@ -70,8 +70,12 @@ object Main extends LazyLogging {
       BanditRealWorld_Bioliq_ADWIN.run()
       BanditNonStaticAbruptChanges_ADWIN.run()
       BanditStatic.run()
+      //BanditRealWorld_Zozo_minus.run()
+      //BanditRealWorld_Bioliq.run()
     }
-      
+    case "com.edouardfouche.experiments.BanditNonStaticAbruptChanges_ADWIN" => BanditNonStaticAbruptChanges_ADWIN.run
+
+
     case "com.edouardfouche.experiments.BanditSynthetic" => {
       BanditNonStaticAbrupt.run()
       BanditNonStaticGradual.run()
