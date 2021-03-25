@@ -15,8 +15,8 @@ import com.edouardfouche.streamsimulator.Simulator
   * @param scalingstrategy the scaling strategy, which decides how many arms to pull for the next step
   * @param k the initial number of pull per round
   */
-case class MP_AWR_Elimination_UCB(delta: Double)(val stream: Simulator, val reward: Reward, val scalingstrategy: ScalingStrategy, var k: Int) extends BanditUCB with BanditAdwin {
-  val name = s"MP-AWR-Elimination-UCB; d=$delta"
+case class MP_ADR_Elimination_UCB(delta: Double)(val stream: Simulator, val reward: Reward, val scalingstrategy: ScalingStrategy, var k: Int) extends BanditUCB with BanditAdwin {
+  val name = s"MP-ADR-Elimination-UCB; d=$delta"
 
   var istar: Array[Int] = (0 until narms).map(x => x).toArray // candidates of the best arms
   var toremove = Array[Int]()

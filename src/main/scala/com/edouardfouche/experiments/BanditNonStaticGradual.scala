@@ -80,20 +80,20 @@ object BanditNonStaticGradual extends BanditSyntheticExperiment {
     //OracleStatic_ADWIN(0.1)(_,_,_,_), OracleDynamic_ADWIN(0.1)(_,_,_,_), OracleRandom_ADWIN(0.1)(_,_,_,_),
     //OracleSequential_ADWIN(0.1)(_,_,_,_),
 
-    //MP_AW_UCB(0.1)(_,_,_,_),
-    //MP_AW_KL_UCB(0.1)(_,_,_,_),
+    //MP_ADS_UCB(0.1)(_,_,_,_),
+    //MP_ADS_KL_UCB(0.1)(_,_,_,_),
     //Exp3M_ADWIN(0.1)(_,_,_,_),
 
     // Ours
-    MP_AW_TS(0.1)(_,_,_,_),
-    MP_AW_TS(0.01)(_,_,_,_),
-    MP_AW_TS(0.001)(_,_,_,_),
-    MP_AWR_TS(0.1)(_,_,_,_),
-    MP_AWR_TS(0.01)(_,_,_,_),
-    MP_AWR_TS(0.001)(_,_,_,_),
-    MP_AWR_Elimination_UCB(0.1)(_,_,_,_),
-    MP_AWR_Elimination_UCB(0.01)(_,_,_,_),
-    MP_AWR_Elimination_UCB(0.001)(_,_,_,_),
+    MP_ADS_TS(0.1)(_,_,_,_),
+    MP_ADS_TS(0.01)(_,_,_,_),
+    MP_ADS_TS(0.001)(_,_,_,_),
+    MP_ADR_TS(0.1)(_,_,_,_),
+    MP_ADR_TS(0.01)(_,_,_,_),
+    MP_ADR_TS(0.001)(_,_,_,_),
+    MP_ADR_Elimination_UCB(0.1)(_,_,_,_),
+    MP_ADR_Elimination_UCB(0.01)(_,_,_,_),
+    MP_ADR_Elimination_UCB(0.001)(_,_,_,_),
   )
 }
 

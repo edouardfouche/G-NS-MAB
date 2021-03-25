@@ -50,12 +50,12 @@ object BanditRealWorld_Bioliq_test extends BanditExperiment {
   )
 
   val banditConstructors = Vector(
-    //MP_AWR_TS(0.1)(_,_,_,_),
-    //MP_AWR_TS(0.01)(_,_,_,_),
-    //MP_AWR_TS(0.001)(_,_,_,_),
-    MP_AWR_Elimination_UCB(0.1)(_,_,_,_),
-    MP_AWR_Elimination_UCB(0.01)(_,_,_,_),
-    MP_AWR_Elimination_UCB(0.001)(_,_,_,_),
+    //MP_ADR_TS(0.1)(_,_,_,_),
+    //MP_ADR_TS(0.01)(_,_,_,_),
+    //MP_ADR_TS(0.001)(_,_,_,_),
+    MP_ADR_Elimination_UCB(0.1)(_,_,_,_),
+    MP_ADR_Elimination_UCB(0.01)(_,_,_,_),
+    MP_ADR_Elimination_UCB(0.001)(_,_,_,_),
   )
 
   def run(): Unit = {

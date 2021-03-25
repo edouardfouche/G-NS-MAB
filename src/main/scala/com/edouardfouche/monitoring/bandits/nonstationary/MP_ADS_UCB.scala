@@ -16,8 +16,8 @@ import com.edouardfouche.streamsimulator.Simulator
   * @param scalingstrategy the scaling strategy, which decides how many arms to pull for the next step
   * @param k the initial number of pull per round
   */
-case class MP_AW_UCB(delta: Double)(val stream: Simulator, val reward: Reward, val scalingstrategy: ScalingStrategy, var k: Int) extends BanditAdwin with BanditUCB {
-  val name = s"MP-AW-UCB; d=$delta"
+case class MP_ADS_UCB(delta: Double)(val stream: Simulator, val reward: Reward, val scalingstrategy: ScalingStrategy, var k: Int) extends BanditAdwin with BanditUCB {
+  val name = s"MP-ADS-UCB; d=$delta"
 
   def next: (Array[(Int, Int)], Array[Double], Double) = {
     val confidences = counts.map(x =>

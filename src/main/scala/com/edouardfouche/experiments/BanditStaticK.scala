@@ -20,7 +20,7 @@ import breeze.linalg
 import breeze.stats.distributions.{RandBasis, ThreadLocalRandomGenerator}
 import com.edouardfouche.monitoring.bandits.Bandit
 import com.edouardfouche.monitoring.bandits.adversarial._
-import com.edouardfouche.monitoring.bandits.nonstationary.MP_AW_TS
+import com.edouardfouche.monitoring.bandits.nonstationary.MP_ADS_TS
 import com.edouardfouche.monitoring.bandits.oracles.OracleStatic
 import com.edouardfouche.monitoring.bandits.stationary._
 import com.edouardfouche.monitoring.rewards.AbsoluteThreshold
@@ -62,7 +62,7 @@ object BanditStaticK extends BanditExperiment {
     MPKLUCB, MPKLUCBPLUS,
     Exp3M,
     MPTS, IMPTS, MPOTS,
-    MP_AW_TS(0.1)(_,_,_,_)
+    MP_ADS_TS(0.1)(_,_,_,_)
     /*
     MP_D_TS(0.7)(_,_,_,_), MP_D_TS(0.8)(_,_,_,_), MP_D_TS(0.9)(_,_,_,_), MP_D_TS(0.99)(_,_,_,_),
     MP_E_Greedy(0.7)(_, _, _, _), MP_E_Greedy(0.8)(_, _, _, _), MP_E_Greedy(0.9)(_, _, _, _), MP_E_Greedy(0.99)(_, _, _, _),
@@ -70,17 +70,17 @@ object BanditStaticK extends BanditExperiment {
 
     OracleStatic_ADWIN(0.1)(_,_,_,_), OracleDynamic_ADWIN(0.1)(_,_,_,_), OracleSequential_ADWIN(0.1)(_,_,_,_),
 
-    MP_AW_UCB(0.1)(_,_,_,_),
-    MP_AW_KL_UCB(0.1)(_,_,_,_),
+    MP_ADS_UCB(0.1)(_,_,_,_),
+    MP_ADS_KL_UCB(0.1)(_,_,_,_),
     OracleRandom_ADWIN(0.1)(_,_,_,_),
     Exp3Mauto_ADWIN(0.1)(_,_,_,_),
-    MP_AW_TS(0.1)(_,_,_,_),
+    MP_ADS_TS(0.1)(_,_,_,_),
 
-    MP_AW_TS(0.5)(_,_,_,_),
-    MP_AW_TS(0.3)(_,_,_,_),
-    MP_AW_TS(1)(_,_,_,_),
-    MP_AW_TS(0.01)(_,_,_,_),
-    MP_AW_TS(0.001)(_,_,_,_)
+    MP_ADS_TS(0.5)(_,_,_,_),
+    MP_ADS_TS(0.3)(_,_,_,_),
+    MP_ADS_TS(1)(_,_,_,_),
+    MP_ADS_TS(0.01)(_,_,_,_),
+    MP_ADS_TS(0.001)(_,_,_,_)
     */
   )
 
@@ -94,10 +94,10 @@ object BanditStaticK extends BanditExperiment {
     MP_E_Greedy(0.8)(_, _, _, _), MP_E_Greedy(0.9)(_, _, _, _), MP_E_Greedy(0.99)(_, _, _, _),
     MP_SW_UCB(100)(_, _, _, _), MP_SW_UCB(1000)(_, _, _, _), MP_SW_UCB(10000)(_, _, _, _),
 
-    MP_AW_UCB(0.1)(_,_,_,_),
-    MP_AW_KL_UCB(0.1)(_,_,_,_),
+    MP_ADS_UCB(0.1)(_,_,_,_),
+    MP_ADS_KL_UCB(0.1)(_,_,_,_),
     Exp3Mauto_ADWIN(0.1)(_,_,_,_),
-    MP_AW_TS(0.1)(_,_,_,_)
+    MP_ADS_TS(0.1)(_,_,_,_)
   )
   */
 

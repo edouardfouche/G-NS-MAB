@@ -19,7 +19,7 @@ package com.edouardfouche.experiments
 import breeze.linalg
 import com.edouardfouche.experiments.Data._
 import com.edouardfouche.monitoring.bandits.adversarial._
-import com.edouardfouche.monitoring.bandits.nonstationary.MP_AW_TS
+import com.edouardfouche.monitoring.bandits.nonstationary.MP_ADS_TS
 import com.edouardfouche.monitoring.bandits.oracles.OracleRandom
 import com.edouardfouche.monitoring.bandits.stationary._
 import com.edouardfouche.monitoring.rewards.AbsoluteThreshold
@@ -71,17 +71,17 @@ object BanditScalabilityK extends BanditExperiment {
 
     //OracleStatic_ADWIN(0.1)(_,_,_,_), OracleDynamic_ADWIN(0.1)(_,_,_,_), OracleSequential_ADWIN(0.1)(_,_,_,_),
 
-    //MP_AW_UCB(0.1)(_,_,_,_),
-    //MP_AW_KL_UCB(0.1)(_,_,_,_),
+    //MP_ADS_UCB(0.1)(_,_,_,_),
+    //MP_ADS_KL_UCB(0.1)(_,_,_,_),
     //OracleRandom_ADWIN(0.1)(_,_,_,_),
     //Exp3Mauto_ADWIN(0.1)(_,_,_,_),
-    MP_AW_TS(0.1)(_,_,_,_)
+    MP_ADS_TS(0.1)(_,_,_,_)
 
-    //MP_AW_TS(0.5)(_,_,_,_),
-    //MP_AW_TS(0.3)(_,_,_,_),
-    //MP_AW_TS(1)(_,_,_,_),
-    //MP_AW_TS(0.01)(_,_,_,_),
-    //MP_AW_TS(0.001)(_,_,_,_)
+    //MP_ADS_TS(0.5)(_,_,_,_),
+    //MP_ADS_TS(0.3)(_,_,_,_),
+    //MP_ADS_TS(1)(_,_,_,_),
+    //MP_ADS_TS(0.01)(_,_,_,_),
+    //MP_ADS_TS(0.001)(_,_,_,_)
   )
 
   def run(): Unit = {

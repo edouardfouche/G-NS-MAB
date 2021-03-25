@@ -19,7 +19,7 @@ package com.edouardfouche.experiments
 import breeze.linalg
 import com.edouardfouche.experiments.Data._
 import com.edouardfouche.monitoring.bandits.adversarial._
-import com.edouardfouche.monitoring.bandits.nonstationary.{MP_AWR_Elimination_UCB, MP_AWR_TS, MP_AW_KL_UCB, MP_AW_TS, MP_AW_UCB, MP_D_TS, MP_D_UCB, MP_E_Greedy, MP_GLR_KL_UCB_G, MP_GLR_KL_UCB_L, MP_M_UCB, MP_SW_TS, MP_SW_UCB, MP_SW_UCB_SHARP_A, MP_SW_UCB_SHARP_G}
+import com.edouardfouche.monitoring.bandits.nonstationary.{MP_ADR_Elimination_UCB, MP_ADR_TS, MP_ADS_KL_UCB, MP_ADS_TS, MP_ADS_UCB, MP_D_TS, MP_D_UCB, MP_E_Greedy, MP_GLR_KL_UCB_G, MP_GLR_KL_UCB_L, MP_M_UCB, MP_SW_TS, MP_SW_UCB, MP_SW_UCB_SHARP_A, MP_SW_UCB_SHARP_G}
 import com.edouardfouche.monitoring.bandits.oracles._
 import com.edouardfouche.monitoring.bandits.stationary._
 import com.edouardfouche.monitoring.rewards.AbsoluteThreshold
@@ -89,20 +89,20 @@ object BanditRealWorld_Bioliq extends BanditExperiment {
     //OracleStatic_ADWIN(0.1)(_,_,_,_), OracleDynamic_ADWIN(0.1)(_,_,_,_), OracleRandom_ADWIN(0.1)(_,_,_,_),
     //OracleSequential_ADWIN(0.1)(_,_,_,_),
 
-    //MP_AW_UCB(0.1)(_,_,_,_),
-    //MP_AW_KL_UCB(0.1)(_,_,_,_),
+    //MP_ADS_UCB(0.1)(_,_,_,_),
+    //MP_ADS_KL_UCB(0.1)(_,_,_,_),
     //Exp3M_ADWIN(0.1)(_,_,_,_),
 
     // Ours
-    MP_AW_TS(0.1)(_,_,_,_),
-    MP_AW_TS(0.01)(_,_,_,_),
-    MP_AW_TS(0.001)(_,_,_,_),
-    MP_AWR_TS(0.1)(_,_,_,_),
-    MP_AWR_TS(0.01)(_,_,_,_),
-    MP_AWR_TS(0.001)(_,_,_,_),
-    MP_AWR_Elimination_UCB(0.1)(_,_,_,_),
-    MP_AWR_Elimination_UCB(0.01)(_,_,_,_),
-    MP_AWR_Elimination_UCB(0.001)(_,_,_,_),
+    MP_ADS_TS(0.1)(_,_,_,_),
+    MP_ADS_TS(0.01)(_,_,_,_),
+    MP_ADS_TS(0.001)(_,_,_,_),
+    MP_ADR_TS(0.1)(_,_,_,_),
+    MP_ADR_TS(0.01)(_,_,_,_),
+    MP_ADR_TS(0.001)(_,_,_,_),
+    MP_ADR_Elimination_UCB(0.1)(_,_,_,_),
+    MP_ADR_Elimination_UCB(0.01)(_,_,_,_),
+    MP_ADR_Elimination_UCB(0.001)(_,_,_,_),
   )
 
   def run(): Unit = {

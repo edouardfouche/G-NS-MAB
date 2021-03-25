@@ -21,9 +21,9 @@ import com.edouardfouche.streamsimulator.Simulator
   * @note This is basically the same as C-KL-UCB in "Thompson Sampling for Combinatorial Semi-Bandits" (Wang2018)
   * @note The implementation is based on https://github.com/jkomiyama/multiplaybanditlib/blob/master/policy/policy_klucb.hpp
   */
-case class MP_AW_KL_UCB(delta: Double)(val stream: Simulator, val reward: Reward,
-                                       val scalingstrategy: ScalingStrategy, var k: Int) extends BanditKLUCB with BanditAdwin {
-  val name = s"MP-AW-KL-UCB; d=$delta"
+case class MP_ADS_KL_UCB(delta: Double)(val stream: Simulator, val reward: Reward,
+                                        val scalingstrategy: ScalingStrategy, var k: Int) extends BanditKLUCB with BanditAdwin {
+  val name = s"MP-ADS-KL-UCB; d=$delta"
 
   def next: (Array[(Int, Int)], Array[Double], Double) = {
     val klindices:Array[(Int,Double)] = (0 until narms).map(x =>
