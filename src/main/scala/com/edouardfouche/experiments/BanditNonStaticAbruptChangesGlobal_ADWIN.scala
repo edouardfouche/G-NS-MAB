@@ -30,7 +30,7 @@ import org.apache.commons.math3.random.MersenneTwister
   * Created by fouchee on 12.07.17.
   * This experiment compares the behavior of various bandits in the face of a "shutdown" change (see ShutdownGenerator)
   */
-object BanditNonStaticAbruptChanges_ADWIN extends BanditExperiment {
+object BanditNonStaticAbruptChangesGlobal_ADWIN extends BanditExperiment {
   val d = 100
   val lmin = 1
   val lmax = d
@@ -38,11 +38,11 @@ object BanditNonStaticAbruptChanges_ADWIN extends BanditExperiment {
   val attributes = List("bandit","dataset","scalingstrategy","k","gain","cputime", "historylength", "iteration")
   val reward = AbsoluteThreshold(1)
 
-  val generators: Array[AbruptChangesGenerator] = Array(
-    AbruptChangesGenerator(1, d),
-    AbruptChangesGenerator(2, d),
-    AbruptChangesGenerator(5, d),
-    AbruptChangesGenerator(10, d)
+  val generators: Array[AbruptChangesGlobalGenerator] = Array(
+    //AbruptChangesGlobalGenerator(1, d),
+    AbruptChangesGlobalGenerator(2, d),
+    AbruptChangesGlobalGenerator(5, d),
+    AbruptChangesGlobalGenerator(10, d)
   )
 
   val nRep = 1
@@ -50,7 +50,7 @@ object BanditNonStaticAbruptChanges_ADWIN extends BanditExperiment {
   val scalingstrategies: Array[ScalingStrategy] = Array(
     //NoScaling(10),
     NoScaling(5),
-    NoScaling(2),
+    //NoScaling(2),
     NoScaling(1)
   )
 
@@ -77,8 +77,6 @@ object BanditNonStaticAbruptChanges_ADWIN extends BanditExperiment {
     info(s"scalingstrategies: ${scalingstrategies.map(_.name) mkString ","}")
     //info(s"reward: ${reward.name}")
     info(s"nRep: ${nRep}")
-
-
 
     for {
       generator <- generators.par

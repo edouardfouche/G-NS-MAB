@@ -9,7 +9,7 @@ import com.edouardfouche.streamsimulator.Simulator
 import scala.util.Random
 
 /**
-  * KL-UCB with multiple plays and Bernoulli Generalized Likelihood Ratio Test, local
+  * KL-UCB with multiple plays and Bernoulli Generalized Likelihood Ratio Test, global
   * See Efficient Change-Point Detection for Tackling Piecewise-Stationary Bandits (Besson 2020 et al.)
   *
   * @param stream          a stream simulator on which we let this bandit run
@@ -22,14 +22,15 @@ import scala.util.Random
   * GLR depends on it, as the criterion is β(n, δ) = ln(math.pow(n,(3/2))/δ)
   * There is also some massive downsampling to make the GLR test computationally OK.
   * A difference between local and global restart
+  * I think that they do not scale well. (to check)
   */
-case class MP_GLR_KL_UCB_L(val stream: Simulator, val reward: Reward, val scalingstrategy: ScalingStrategy, var k: Int) extends BanditKLUCB {
-  val name = "MP-GLR-KL-UCB-L"
+case class MP_GLR_KL_UCB_G_F(val stream: Simulator, val reward: Reward, val scalingstrategy: ScalingStrategy, var k: Int) extends BanditKLUCB {
+  val name = "MP-GLR-KL-UCB-G-F"
 
   var historyarm: Array[List[Double]] = (0 until narms).map(_ => List[Double]()).toArray
 
-  val deltas = 5 // smallest window considered
-  val deltat = 10 // check for change every deltat time steps
+  val deltas = 16 // smallest window considered
+  val deltat = 32 // check for change every deltat time steps
   val horizon: Int = stream.nbatches
   var nepisodes: Int = 1 // number of episodes (restarts/changes)
 
@@ -80,37 +81,38 @@ case class MP_GLR_KL_UCB_L(val stream: Simulator, val reward: Reward, val scalin
 
     k = scalingstrategy.scale(gains, indexes, sums, counts, t)
 
+    (0 until narms).foreach { x =>
+      if(((historyarm(x).length-1) % deltat == 0) && (historyarm(x).length >= deltat)) {
+        val ncheck = math.floor(historyarm(x).length / deltas).toInt-1 // This is the number of window pairs we are going to check
+        val beta: Double = math.log(math.pow(historyarm(x).length,(3/2))/delta)
+        var glr:Double = 0.0
 
-      (0 until narms).foreach { x =>
-        // if we don't change anything (no observation), there will be no change too
-        if(((historyarm(x).length-1) % deltat == 0) && (historyarm(x).length >= deltat)) { // Try to detect changes only every deltat time steps
-          val ncheck = math.floor(historyarm(x).length / deltas).toInt-1 // This is the number of window pairs we are going to check
-          val beta: Double = math.log(math.pow(historyarm(x).length,(3/2))/delta)
-          var glr:Double = 0.0
-
-          val tocheck = (1 to ncheck).toList
-
-          for(y <- tocheck) {
-            val s = y*deltas // number of points in first window
-            val mu1 = historyarm(x).slice(0, s).sum / s
-            val mu2 = historyarm(x).slice(s, historyarm(x).length).sum / (historyarm(x).length-s)
-            val mu = historyarm(x).sum / historyarm(x).length
-            glr = glr.max(s*kl_safe(mu1, mu) + (historyarm(x).length-s)*kl_safe(mu2, mu))
-          }
-          if(glr > beta) { // reinitialize all data for this arm
-            //println(s"Change detected at time $t at arm $x, history of this arm: ${historyarm(x).length}")
-            tarms(x) = initializationvalue
-            counts(x) = initializationvalue
-            sums(x) = initializationvalue
-            historyarm(x) = List[Double]()
-            changedetected = true // flag that a change was detected
-          }
+        val tocheck = if(ncheck > 100) {
+          //println(s"GLR-klUCB window at time $t on arm $x is too big, limiting to 1000 (random)")
+          Random.shuffle((1 to ncheck).toList).take(100)
+        } else (1 to ncheck).toList
+        for(y <- tocheck) {
+          val s = y*deltas // number of points in first window
+          val mu1 = historyarm(x).slice(0, s).sum / s
+          val mu2 = historyarm(x).slice(s, historyarm(x).length).sum / (historyarm(x).length-s)
+          val mu = historyarm(x).sum / historyarm(x).length
+          glr = glr.max(s*kl_safe(mu1, mu) + (historyarm(x).length-s)*kl_safe(mu2, mu))
+        }
+        if(glr > beta) { // reinitialize all data for this arm
+          changedetected = true // flag that a change was detected
+        }
       }
     }
 
     if(changedetected) { // there was at least one change!
       nepisodes += 1 // increase number of episodes
       changedetected = false // reset the change detected flag
+      (0 until narms).foreach { x => // reinitialize all the arms
+        tarms(x) = initializationvalue
+        counts(x) = initializationvalue
+        sums(x) = initializationvalue
+        historyarm(x) = List[Double]()
+      }
     }
 
     val gain = gains.sum

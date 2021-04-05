@@ -25,14 +25,14 @@ import com.edouardfouche.preprocess._
 
 /**
   * Created by fouchee on 12.07.17.
-  * This experiment compares the behavior of various bandits in the face of a gradual change (see GradualGenerator)
+  * This experiment compares the behavior of various bandits in the face of a "shutdown" change (see ShutdownGenerator)
   */
-object BanditNonStaticGradual extends BanditSyntheticExperiment {
+object BanditNonStaticAbruptGlobal extends BanditSyntheticExperiment {
   val d = 100
   val lmin = 1
   val lmax = d
 
-  val generator= GradualGenerator(d)
+  val generator= AbruptGlobalGenerator(d)
 
   val nRep = 5
 
@@ -55,7 +55,8 @@ object BanditNonStaticGradual extends BanditSyntheticExperiment {
 
     // Static
     MPTS, MPKLUCB,//, IMPTS, MPOTS,
-    MP_E_Greedy(0.7)(_, _, _, _), MP_E_Greedy(0.8)(_, _, _, _), MP_E_Greedy(0.9)(_, _, _, _), MP_E_Greedy(0.99)(_, _, _, _),
+    MP_E_Greedy(0.7)(_, _, _, _), MP_E_Greedy(0.8)(_, _, _, _),
+    MP_E_Greedy(0.9)(_, _, _, _), MP_E_Greedy(0.99)(_, _, _, _),
 
     // Passive approaches
     MP_D_TS(0.7)(_,_,_,_), MP_D_TS(0.8)(_,_,_,_), MP_D_TS(0.9)(_,_,_,_), MP_D_TS(0.99)(_,_,_,_),
@@ -98,4 +99,3 @@ object BanditNonStaticGradual extends BanditSyntheticExperiment {
     MP_ADR_Elimination_UCB(0.001)(_,_,_,_),
   )
 }
-

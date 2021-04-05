@@ -54,7 +54,8 @@ case class MP_SW_TS(windowsize: Int)(val stream: Simulator, val reward: Reward, 
       counts.indices.foreach { x =>
         counts(x) -= countsbuffer(x)(bufferposition)
         sums(x) -= sumsbuffer(x)(bufferposition)
-        beta_params(x) = ((beta_params(x)._1 - sumsbuffer(x)(bufferposition)).max(0.001), (beta_params(x)._2-(1.0-sumsbuffer(x)(bufferposition))).max(0.001))
+        //beta_params(x) = ((beta_params(x)._1 - sumsbuffer(x)(bufferposition)).max(0.001), (beta_params(x)._2-(1.0-sumsbuffer(x)(bufferposition))).max(0.001))
+        beta_params(x) = ((1.0+sums(x)).max(0.001), (1.0+counts(x)-sums(x)).max(0.001))
       }
     }
 

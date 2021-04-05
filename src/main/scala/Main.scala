@@ -67,13 +67,19 @@ object Main extends LazyLogging {
     case "com.edouardfouche.experiments.BanditGradual" => BanditNonStaticGradual.run()
     case "com.edouardfouche.experiments.BanditStatic" => BanditStatic.run()
     case "com.edouardfouche.experiments.BanditExtra" => {
+      BanditRealWorld_Bioliq.run()
+      BanditRealWorld_Zozo_minus.run()
       BanditRealWorld_Bioliq_ADWIN.run()
-      BanditNonStaticAbruptChanges_ADWIN.run()
+      BanditNonStaticGradualGlobal_ADWIN.run()
+      BanditNonStaticAbruptChangesGlobal_ADWIN.run()
+      BanditNonStaticAbruptGlobal.run()
+      BanditNonStaticGradualGlobal.run()
       BanditStatic.run()
       //BanditRealWorld_Zozo_minus.run()
       //BanditRealWorld_Bioliq.run()
     }
-    case "com.edouardfouche.experiments.BanditNonStaticAbruptChanges_ADWIN" => BanditNonStaticAbruptChanges_ADWIN.run
+
+    case "com.edouardfouche.experiments.BanditNonStaticAbruptChanges_ADWIN" => BanditNonStaticAbruptChanges_ADWIN.run()
 
 
     case "com.edouardfouche.experiments.BanditSynthetic" => {

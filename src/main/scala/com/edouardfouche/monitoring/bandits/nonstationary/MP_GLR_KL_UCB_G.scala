@@ -30,8 +30,8 @@ case class MP_GLR_KL_UCB_G(val stream: Simulator, val reward: Reward, val scalin
 
   var historyarm: Array[List[Double]] = (0 until narms).map(_ => List[Double]()).toArray
 
-  val deltas = 5 // only check changes for every 5 observations
-  val deltat = 10 // check for change every 10 time steps
+  val deltas = 5 // smallest window considered
+  val deltat = 10 // check for change every deltat time steps
   val horizon: Int = stream.nbatches
   var nepisodes: Int = 1 // number of episodes (restarts/changes)
 
@@ -88,10 +88,7 @@ case class MP_GLR_KL_UCB_G(val stream: Simulator, val reward: Reward, val scalin
         val beta: Double = math.log(math.pow(historyarm(x).length,(3/2))/delta)
         var glr:Double = 0.0
 
-        val tocheck = if(ncheck > 100) {
-          //println(s"GLR-klUCB window at time $t on arm $x is too big, limiting to 1000 (random)")
-          (1 to ncheck).toList
-        } else Random.shuffle((1 to ncheck).toList).take(100)
+        val tocheck = (1 to ncheck).toList
         for(y <- tocheck) {
           val s = y*deltas // number of points in first window
           val mu1 = historyarm(x).slice(0, s).sum / s

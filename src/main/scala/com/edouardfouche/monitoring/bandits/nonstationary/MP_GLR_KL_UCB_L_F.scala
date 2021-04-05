@@ -23,13 +23,13 @@ import scala.util.Random
   * There is also some massive downsampling to make the GLR test computationally OK.
   * A difference between local and global restart
   */
-case class MP_GLR_KL_UCB_L(val stream: Simulator, val reward: Reward, val scalingstrategy: ScalingStrategy, var k: Int) extends BanditKLUCB {
-  val name = "MP-GLR-KL-UCB-L"
+case class MP_GLR_KL_UCB_L_F(val stream: Simulator, val reward: Reward, val scalingstrategy: ScalingStrategy, var k: Int) extends BanditKLUCB {
+  val name = "MP-GLR-KL-UCB-L-F"
 
   var historyarm: Array[List[Double]] = (0 until narms).map(_ => List[Double]()).toArray
 
-  val deltas = 5 // smallest window considered
-  val deltat = 10 // check for change every deltat time steps
+  val deltas = 16 // smallest window considered
+  val deltat = 32 // check for change every deltat time steps
   val horizon: Int = stream.nbatches
   var nepisodes: Int = 1 // number of episodes (restarts/changes)
 
@@ -88,7 +88,10 @@ case class MP_GLR_KL_UCB_L(val stream: Simulator, val reward: Reward, val scalin
           val beta: Double = math.log(math.pow(historyarm(x).length,(3/2))/delta)
           var glr:Double = 0.0
 
-          val tocheck = (1 to ncheck).toList
+          val tocheck = if(ncheck > 10) {
+            //println(s"GLR-klUCB window at time $t on arm $x is too big, limiting to 1000 (random)")
+            Random.shuffle((1 to ncheck).toList).take(10)
+          } else (1 to ncheck).toList
 
           for(y <- tocheck) {
             val s = y*deltas // number of points in first window

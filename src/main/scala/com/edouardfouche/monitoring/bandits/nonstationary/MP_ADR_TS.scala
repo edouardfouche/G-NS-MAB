@@ -59,9 +59,10 @@ case class MP_ADR_TS(delta: Double)(val stream: Simulator, val reward: Reward, v
 
     val smallest_window = windows.minBy(_._2) // this is the smallest window
 
+
     // Then some ADWIN instance has shrinked and we must reset.
     if(smallest_window._2.toInt < history.length-1) {
-      //println(s"${name} resetting at time t=$t, smallestw=${smallest_window._2.toInt}, history.length=${history.length}")
+      println(s"${name} resetting at time t=$t, smallestw=${smallest_window._2.toInt}, history.length=${history.length}")
       sharedAdwin = new SharedAdwin(stream.npairs, delta)
       history = List()
       beta_params = (0 until narms).map(x => (1.0,1.0)).toArray

@@ -27,12 +27,12 @@ import com.edouardfouche.preprocess._
   * Created by fouchee on 12.07.17.
   * This experiment compares the behavior of various bandits in the face of a gradual change (see GradualGenerator)
   */
-object BanditNonStaticGradual extends BanditSyntheticExperiment {
+object BanditNonStaticGradualGlobal extends BanditSyntheticExperiment {
   val d = 100
   val lmin = 1
   val lmax = d
 
-  val generator= GradualGenerator(d)
+  val generator= GradualGlobalGenerator(d)
 
   val nRep = 5
 

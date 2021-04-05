@@ -19,7 +19,7 @@ package com.edouardfouche.experiments
 import breeze.linalg
 import com.edouardfouche.experiments.Data._
 import com.edouardfouche.monitoring.bandits.adversarial._
-import com.edouardfouche.monitoring.bandits.nonstationary.{MP_ADR_Elimination_UCB, MP_ADR_TS, MP_ADS_KL_UCB, MP_ADS_TS, MP_ADS_UCB, MP_D_TS, MP_D_UCB, MP_E_Greedy, MP_GLR_KL_UCB_G, MP_GLR_KL_UCB_L, MP_M_UCB, MP_SW_TS, MP_SW_UCB, MP_SW_UCB_SHARP_A, MP_SW_UCB_SHARP_G}
+import com.edouardfouche.monitoring.bandits.nonstationary.{MP_ADR_Elimination_UCB, MP_ADR_TS, MP_ADS_KL_UCB, MP_ADS_TS, MP_ADS_UCB, MP_D_TS, MP_D_UCB, MP_E_Greedy, MP_GLR_KL_UCB_G, MP_GLR_KL_UCB_G_F, MP_GLR_KL_UCB_L, MP_GLR_KL_UCB_L_F, MP_M_UCB, MP_SW_TS, MP_SW_UCB, MP_SW_UCB_SHARP_A, MP_SW_UCB_SHARP_G}
 import com.edouardfouche.monitoring.bandits.oracles._
 import com.edouardfouche.monitoring.bandits.stationary._
 import com.edouardfouche.monitoring.rewards.AbsoluteThreshold
@@ -83,6 +83,8 @@ object BanditRealWorld_Bioliq extends BanditExperiment {
     // Active
     MP_GLR_KL_UCB_G(_,_,_,_),
     MP_GLR_KL_UCB_L(_,_,_,_),
+    MP_GLR_KL_UCB_G_F(_,_,_,_),
+    MP_GLR_KL_UCB_L_F(_,_,_,_),
     MP_M_UCB(1000, 10)(_,_,_,_), MP_M_UCB(5000, 10)(_,_,_,_),
     MP_M_UCB(1000, 100)(_,_,_,_), MP_M_UCB(5000, 100)(_,_,_,_),
 

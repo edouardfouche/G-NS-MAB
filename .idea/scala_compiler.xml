@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ScalaCompilerConfiguration">
-    <profile name="sbt 1" modules="BanditMonitoring,S-MAB,U-NS-MAB">
+    <profile name="sbt 1" modules="BanditMonitoring,G-NS-MAB,S-MAB,U-NS-MAB">
       <option name="featureWarnings" value="true" />
     </profile>
   </component>

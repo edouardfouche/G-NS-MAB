@@ -75,6 +75,8 @@ object BanditNonStaticAbrupt extends BanditSyntheticExperiment {
     // Active
     MP_GLR_KL_UCB_G(_,_,_,_),
     MP_GLR_KL_UCB_L(_,_,_,_),
+    MP_GLR_KL_UCB_G_F(_,_,_,_),
+    MP_GLR_KL_UCB_L_F(_,_,_,_),
     MP_M_UCB(1000, 10)(_,_,_,_), MP_M_UCB(5000, 10)(_,_,_,_),
     MP_M_UCB(1000, 100)(_,_,_,_), MP_M_UCB(5000, 100)(_,_,_,_),
 
