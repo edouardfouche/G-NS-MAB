@@ -39,7 +39,7 @@ case class AbruptGlobalGenerator(d: Int = 100) extends Scenario{
 
     val cols: Array[Array[Double]] = means.zipWithIndex.map{x =>
       val b = new Bernoulli(x._1)(rand)
-      val index = x._2
+      //val index = x._2
       val partA: Array[Double] = (0 until n/3).toArray.map(y => if(b.draw()) 1.0 else 0.0)
       val partB: Array[Double] = (0 until n/3).toArray.map{y => if(b.draw()) 0.0 else 1.0}
       val partC: Array[Double] = (0 until (n/3+n%3)).toArray.map(y => if(b.draw()) 1.0 else 0.0)

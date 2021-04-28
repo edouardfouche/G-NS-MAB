@@ -25,7 +25,7 @@ import org.apache.commons.math3.random.MersenneTwister
   * @param d number of arms
   */
 case class GradualGlobalGenerator(d: Int = 100) extends Scenario{
-  val id = s"GradualGenerator-$d"
+  val id = s"GradualGlobalGenerator-$d"
   val n = 100000
   /**
     * generate data
@@ -36,18 +36,18 @@ case class GradualGlobalGenerator(d: Int = 100) extends Scenario{
     //val a = (1 to d).map(_/d.toDouble - 1/(3*d.toDouble)).toArray
     val a = (1 to d).map(_/d.toDouble).toArray
     val means = a.reverse
-    val nevents = 60
-    val eventpoints = (1 to nevents).map(_*n/(nevents.toDouble+1)).toArray
-    val stepstates = (0 to nevents/2) ++ (0 until nevents/2).reverse
 
-    (0 until n).toArray.map{x =>
-      val step = eventpoints.count(_ < x)
-      means.zipWithIndex.map{y =>
-        val a1 = (nevents/2 - stepstates(step))/(nevents/2)
-        val a2 = stepstates(step)/(nevents/2)
-        val b = new Bernoulli(y._1*a1 + (1-y._1)*a2)(rand)
-        if(b.draw()) 1.0 else 0.0
+    val cols: Array[Array[Double]] = means.zipWithIndex.map{x =>
+      val partA: Array[Double] = (0 until n).toArray.map {y =>
+        val b = new Bernoulli(x._1*((n-y)/n) + (1-x._1)*(y/n))(rand)
+        if (b.draw()) 1.0 else 0.0
       }
+      //val partB: Array[Double] = (0 until n/2).toArray.map{y =>
+      //  val b = new Bernoulli((1-x._1)*(((n/2)-y)/(n/2)) + x._1*(y/(n/2)))(rand)
+      //  if(b.draw()) 1.0 else 0.0
+      //}
+      partA //++ partB
     }
+    cols.transpose
   }
 }

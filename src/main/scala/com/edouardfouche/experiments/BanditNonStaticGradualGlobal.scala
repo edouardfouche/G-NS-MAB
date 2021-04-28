@@ -18,7 +18,7 @@ package com.edouardfouche.experiments
 
 import com.edouardfouche.monitoring.bandits.adversarial._
 import com.edouardfouche.monitoring.bandits.nonstationary._
-import com.edouardfouche.monitoring.bandits.oracles.{OracleDynamic, OracleRandom, OracleStatic}
+import com.edouardfouche.monitoring.bandits.oracles.{OracleDynamic, OracleGradualGlobal, OracleRandom, OracleStatic}
 import com.edouardfouche.monitoring.bandits.stationary._
 import com.edouardfouche.monitoring.scalingstrategies._
 import com.edouardfouche.preprocess._
@@ -48,6 +48,7 @@ object BanditNonStaticGradualGlobal extends BanditSyntheticExperiment {
     OracleDynamic,
     OracleStatic,
     OracleRandom,
+    OracleGradualGlobal,
     //OracleSequential,
     //CUCB, CUCBm,
     //MPKLUCB, MPKLUCBPLUS,
