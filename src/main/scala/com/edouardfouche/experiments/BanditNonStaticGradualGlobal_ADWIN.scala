@@ -19,6 +19,7 @@ package com.edouardfouche.experiments
 import breeze.linalg
 import breeze.stats.distributions.{RandBasis, ThreadLocalRandomGenerator}
 import com.edouardfouche.monitoring.bandits.nonstationary._
+import com.edouardfouche.monitoring.bandits.oracles.{OracleAbruptGlobal, OracleDynamic, OracleGradualGlobal, OracleRandom, OracleStatic}
 import com.edouardfouche.monitoring.rewards.AbsoluteThreshold
 import com.edouardfouche.monitoring.scalingstrategies._
 import com.edouardfouche.preprocess._
@@ -47,18 +48,28 @@ object BanditNonStaticGradualGlobal_ADWIN extends BanditExperiment {
   val scalingstrategies: Array[ScalingStrategy] = Array(
     //NoScaling(10),
     NoScaling(5),
-    //NoScaling(2),
+    NoScaling(2),
     NoScaling(1)
   )
 
   val banditConstructors = Vector(
+    OracleDynamic,
+    OracleStatic,
+    OracleRandom,
+    OracleGradualGlobal,
     // Ours
+    MP_ADS_TS_ADWIN1(0.1)(_,_,_,_),
+    MP_ADS_TS_ADWIN1(0.01)(_,_,_,_),
+    MP_ADS_TS_ADWIN1(0.001)(_,_,_,_),
     MP_ADS_TS(0.1)(_,_,_,_),
     MP_ADS_TS(0.01)(_,_,_,_),
     MP_ADS_TS(0.001)(_,_,_,_),
     MP_ADR_TS(0.1)(_,_,_,_),
     MP_ADR_TS(0.01)(_,_,_,_),
     MP_ADR_TS(0.001)(_,_,_,_),
+    MP_ADR_TS_ADWIN1(0.1)(_,_,_,_),
+    MP_ADR_TS_ADWIN1(0.01)(_,_,_,_),
+    MP_ADR_TS_ADWIN1(0.001)(_,_,_,_),
     MP_ADR_Elimination_UCB(0.1)(_,_,_,_),
     MP_ADR_Elimination_UCB(0.01)(_,_,_,_),
     MP_ADR_Elimination_UCB(0.001)(_,_,_,_),

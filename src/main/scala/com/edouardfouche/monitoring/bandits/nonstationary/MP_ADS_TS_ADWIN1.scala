@@ -2,7 +2,6 @@ package com.edouardfouche.monitoring.bandits.nonstationary
 
 import breeze.stats.distributions.Beta
 import com.edouardfouche.monitoring.bandits.{BanditAdwin, BanditTS}
-import com.edouardfouche.monitoring.resetstrategies.SharedAdwin
 import com.edouardfouche.monitoring.rewards.Reward
 import com.edouardfouche.monitoring.scalingstrategies.ScalingStrategy
 import com.edouardfouche.streamsimulator.Simulator
@@ -18,8 +17,14 @@ import com.edouardfouche.streamsimulator.Simulator
   * @param scalingstrategy the scaling strategy, which decides how many arms to pull for the next step
   * @param k the initial number of pull per round
   */
-case class MP_ADR_TS(delta: Double)(val stream: Simulator, val reward: Reward, val scalingstrategy: ScalingStrategy, var k: Int) extends BanditTS with BanditAdwin {
-  val name = s"MP-ADR-TS; d=$delta"
+case class MP_ADS_TS_ADWIN1(delta: Double)(val stream: Simulator, val reward: Reward, val scalingstrategy: ScalingStrategy, var k: Int) extends BanditTS with BanditAdwin {
+  val name = s"MP-ADS-TS-ADWIN1; d=$delta"
+
+  //var history: List[scala.collection.mutable.Map[Int,Double]] = List() // first el in the update for count, and last in the update for weight
+  val cumulative_history: scala.collection.mutable.Map[Int,List[(Int,Double)]] =
+    scala.collection.mutable.Map[Int,List[(Int,Double)]]()
+  var changedetected: Boolean = false // Just to flag whether there was a change in the iteration or not
+  def epsilon(n:Int,m:Int): Double = math.sqrt(math.log(1.0/delta)/(2.0*n)) + math.sqrt(math.log(1.0/delta)/(2.0*m))
 
   def next: (Array[(Int, Int)], Array[Double], Double) = {
     val draws = beta_params.zipWithIndex.map(x => (x._2, new Beta(x._1._1,x._1._2).draw())).sortBy(- _._2).take(k)
@@ -44,7 +49,8 @@ case class MP_ADR_TS(delta: Double)(val stream: Simulator, val reward: Reward, v
       sums(x._1) += d
 
       // Add into adwin and add the update into the map
-      sharedAdwin.addElement(x._1, d)
+      //sharedAdwin.addElement(x._1, d)
+      cumulative_history(x._1) = cumulative_history(x._1) :+ (cumulative_history(x._1).last._1 + 1, cumulative_history(x._1).last._2 + d)
       updates(x._1) = d
       d
     })
@@ -53,24 +59,40 @@ case class MP_ADR_TS(delta: Double)(val stream: Simulator, val reward: Reward, v
 
     k = scalingstrategy.scale(gains, indexes, sums, counts, t)
 
+    // ADWIN1 change detection
+    (0 until narms).foreach { x =>
+      if(cumulative_history(x).length > 10) {
+        val (nt,st) = cumulative_history(x).last
+        changedetected = true
+        while(changedetected || (cumulative_history(x).length <= 10)) { // Do this until no change is detected or window is too small
+          changedetected = false
+          for(y <- cumulative_history(x)) if(math.abs(y._2/y._1 - (y._2-st)/(y._1-nt)) > epsilon(y._1, nt - y._1)) changedetected = true
+          if(changedetected) cumulative_history(x) = cumulative_history(x).tail // delete oldest sample
+        }
+      }
+    }
+
     // Here we, add up the size of the adwin (those are the number of pulls) and the number of unpulls, to get the
     // actual size of window each arm.
-    val windows = (0 until narms).map(x => (x, sharedAdwin.getSingleSize(x) + (history.length-counts(x))))
-
+    val windows = (0 until narms).map(x => (x, cumulative_history(x).length + (history.length-counts(x))))
     val smallest_window = windows.minBy(_._2) // this is the smallest window
 
-    // Then some ADWIN instance has shrinked and we must reset.
+    // Rolling back
     if(smallest_window._2.toInt < history.length-1) {
-      //println(s"${name} resetting at time t=$t, smallestw=${smallest_window._2.toInt}, history.length=${history.length}")
-      sharedAdwin = new SharedAdwin(stream.npairs, delta)
-      history = List()
-      beta_params = (0 until narms).map(x => (1.0,1.0)).toArray
-      sums = (0 until narms).map(_ => initializationvalue).toArray // Initialization the weights to maximal gain forces to exploration at the early phase
-      counts = sums.map(_ => initializationvalue)
+      for{
+        x <- smallest_window._2.toInt until history.length
+      } {
+        val rollback = history.head
+        history = history.tail
+        for((key,value) <- rollback) {
+          sums(key) = sums(key) - value // if(counts(key) == 1.0) 1.0 else weights(key) - (1.0/(counts(key)-1.0))*(value._1 - weights(key))
+          counts(key) = counts(key) - 1 //- value._2
+          beta_params(key) = (beta_params(key)._1-value, beta_params(key)._2-(1.0-value))
+        }
+      }
     }
     t = history.length + 1 // The time context is the same as the history, which is the same as the smallest window
 
     (arms, gains, gains.sum)
   }
-
 }

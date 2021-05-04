@@ -18,8 +18,9 @@ package com.edouardfouche.experiments
 
 import breeze.linalg
 import breeze.stats.distributions.{RandBasis, ThreadLocalRandomGenerator}
+import com.edouardfouche.experiments.BanditNonStaticAbruptGlobal.d
 import com.edouardfouche.monitoring.bandits.nonstationary._
-import com.edouardfouche.monitoring.bandits.oracles.OracleDynamic
+import com.edouardfouche.monitoring.bandits.oracles.{OracleAbruptGlobal, OracleDynamic, OracleRandom, OracleStatic}
 import com.edouardfouche.monitoring.rewards.AbsoluteThreshold
 import com.edouardfouche.monitoring.scalingstrategies._
 import com.edouardfouche.preprocess._
@@ -30,7 +31,7 @@ import org.apache.commons.math3.random.MersenneTwister
   * Created by fouchee on 12.07.17.
   * This experiment compares the behavior of various bandits in the face of a "shutdown" change (see ShutdownGenerator)
   */
-object BanditNonStaticAbruptChanges_ADWIN extends BanditExperiment {
+object BanditNonStaticAbruptGlobal_ADWIN extends BanditExperiment {
   val d = 100
   val lmin = 1
   val lmax = d
@@ -38,11 +39,12 @@ object BanditNonStaticAbruptChanges_ADWIN extends BanditExperiment {
   val attributes = List("bandit","dataset","scalingstrategy","k","gain","cputime", "historylength", "iteration")
   val reward = AbsoluteThreshold(1)
 
-  val generators: Array[AbruptChangesGenerator] = Array(
-    AbruptChangesGenerator(1, d),
-    AbruptChangesGenerator(2, d),
-    AbruptChangesGenerator(5, d),
-    AbruptChangesGenerator(10, d)
+  val generators: Array[AbruptGlobalGenerator] = Array(
+    //AbruptChangesGenerator(1, d),
+    //AbruptChangesGenerator(2, d),
+    //AbruptChangesGenerator(5, d),
+    //AbruptChangesGenerator(10, d)
+    AbruptGlobalGenerator(d)
   )
 
   val nRep = 1
@@ -55,13 +57,23 @@ object BanditNonStaticAbruptChanges_ADWIN extends BanditExperiment {
   )
 
   val banditConstructors = Vector(
+    OracleDynamic,
+    OracleStatic,
+    OracleRandom,
+    OracleAbruptGlobal,
     // Ours
+    MP_ADS_TS_ADWIN1(0.1)(_,_,_,_),
+    MP_ADS_TS_ADWIN1(0.01)(_,_,_,_),
+    MP_ADS_TS_ADWIN1(0.001)(_,_,_,_),
     MP_ADS_TS(0.1)(_,_,_,_),
     MP_ADS_TS(0.01)(_,_,_,_),
     MP_ADS_TS(0.001)(_,_,_,_),
     MP_ADR_TS(0.1)(_,_,_,_),
     MP_ADR_TS(0.01)(_,_,_,_),
     MP_ADR_TS(0.001)(_,_,_,_),
+    MP_ADR_TS_ADWIN1(0.1)(_,_,_,_),
+    MP_ADR_TS_ADWIN1(0.01)(_,_,_,_),
+    MP_ADR_TS_ADWIN1(0.001)(_,_,_,_),
     MP_ADR_Elimination_UCB(0.1)(_,_,_,_),
     MP_ADR_Elimination_UCB(0.01)(_,_,_,_),
     MP_ADR_Elimination_UCB(0.001)(_,_,_,_),
@@ -77,8 +89,6 @@ object BanditNonStaticAbruptChanges_ADWIN extends BanditExperiment {
     info(s"scalingstrategies: ${scalingstrategies.map(_.name) mkString ","}")
     //info(s"reward: ${reward.name}")
     info(s"nRep: ${nRep}")
-
-
 
     for {
       generator <- generators.par
@@ -138,10 +148,7 @@ object BanditNonStaticAbruptChanges_ADWIN extends BanditExperiment {
           }
         }
       }
-
-
     }
-
     info(s"End of experiment ${this.getClass.getSimpleName} - ${formatter.format(java.util.Calendar.getInstance().getTime)}")
   }
 }
