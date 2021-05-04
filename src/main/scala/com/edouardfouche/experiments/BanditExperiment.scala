@@ -180,7 +180,10 @@ trait BanditExperiment extends LazyLogging {
     } else {
       bandit match {
         case bandit: BanditAdwin => fullrunnerGainsKsCPUW(bandit, gains :+ nextresult._3, ks :+ k, cpu :+ time, historylengths :+ bandit.history.length.toDouble)
-        case _ => fullrunnerGainsKsCPUW(bandit, gains :+ nextresult._3, ks :+ k, cpu :+ time, historylengths :+ historylengths.last + 1.0)
+        case _ => {
+          val lasthistory = if(historylengths.isEmpty) 0.0 else historylengths.last
+          fullrunnerGainsKsCPUW(bandit, gains :+ nextresult._3, ks :+ k, cpu :+ time, historylengths :+ lasthistory + 1.0)
+        }
       }
     }
   }
