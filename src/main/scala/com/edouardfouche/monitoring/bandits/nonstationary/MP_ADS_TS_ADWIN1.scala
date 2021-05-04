@@ -50,7 +50,8 @@ case class MP_ADS_TS_ADWIN1(delta: Double)(val stream: Simulator, val reward: Re
 
       // Add into adwin and add the update into the map
       //sharedAdwin.addElement(x._1, d)
-      cumulative_history(x._1) = cumulative_history(x._1) :+ (cumulative_history(x._1).last._1 + 1, cumulative_history(x._1).last._2 + d)
+      val lastelement: (Int, Double) = if(cumulative_history(x._1).isEmpty) (0,0.0) else cumulative_history(x._1).last
+      cumulative_history(x._1) = cumulative_history(x._1) :+ (lastelement._1 + 1, lastelement._2 + d)
       updates(x._1) = d
       d
     })
