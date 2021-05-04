@@ -47,7 +47,7 @@ object BanditNonStaticAbruptGlobal_ADWIN extends BanditExperiment {
     AbruptGlobalGenerator(d)
   )
 
-  val nRep = 1
+  val nRep = 5
 
   val scalingstrategies: Array[ScalingStrategy] = Array(
     //NoScaling(10),
@@ -91,7 +91,7 @@ object BanditNonStaticAbruptGlobal_ADWIN extends BanditExperiment {
     info(s"nRep: ${nRep}")
 
     for {
-      generator <- generators.par
+      generator <- generators
     } {
       val id= generator.id
 
@@ -118,7 +118,7 @@ object BanditNonStaticAbruptGlobal_ADWIN extends BanditExperiment {
             //info(s"Starting com.edouardfouche.experiments with data: ${d.id}, configuration k: ${kratio}, rep=$rep")
             //val bandit = banditConstructor(streamsimulator.copy(), reward, scalingstrategy, scalingstrategy.k)
             val bandit = banditConstructor._1(simulators(rep).copy(), reward, scalingstrategy, lmax)
-            if (rep % 10 == 0) info(s"Reached rep $rep with bandit ${bandit.name}, ${scalingstrategy.name}")
+            if (rep % 1 == 0) info(s"Reached rep $rep with bandit ${bandit.name}, ${scalingstrategy.name}")
             val (gains, ks, cpu, historylengths) = fullrunnerGainsKsCPUW(bandit, Array[Double](), Array[Int](), Array[Double](), Array[Double]())
             allgains = allgains +:+ (breeze.linalg.Vector(gains) *:* (1.0/nRep))
             allks = allks +:+ (breeze.linalg.Vector(ks.map(_.toDouble)) *:* (1.0/nRep))
