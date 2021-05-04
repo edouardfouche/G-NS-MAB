@@ -23,8 +23,7 @@ case class MP_ADR_TS_ADWIN1(delta: Double)(val stream: Simulator, val reward: Re
 
   //var history: List[scala.collection.mutable.Map[Int,Double]] = List() // first el in the update for count, and last in the update for weight
   var cumulative_history: scala.collection.mutable.Map[Int,List[(Int,Double)]] =
-    scala.collection.mutable.Map[Int,List[(Int,Double)]]()
-  (0 until narms).foreach(x => cumulative_history(x) = List[(Int,Double)]())
+    collection.mutable.Map((0 until narms).map(x => x -> List[(Int,Double)]()).toMap.toSeq: _*)
   var changedetected: Boolean = false // Just to flag whether there was a change in the iteration or not
   def epsilon(n:Int,m:Int): Double = math.sqrt(math.log(1.0/delta)/(2.0*n)) + math.sqrt(math.log(1.0/delta)/(2.0*m))
 
@@ -83,7 +82,7 @@ case class MP_ADR_TS_ADWIN1(delta: Double)(val stream: Simulator, val reward: Re
     if(smallest_window._2.toInt < history.length-1) {
       println(s"${name} resetting at time t=$t, smallestw=${smallest_window._2.toInt}, history.length=${history.length}")
       history = List()
-      cumulative_history = scala.collection.mutable.Map[Int,List[(Int,Double)]]()
+      cumulative_history = collection.mutable.Map((0 until narms).map(x => x -> List[(Int,Double)]()).toMap.toSeq: _*)
       (0 until narms).foreach(x => cumulative_history(x) = List[(Int,Double)]())
       beta_params = (0 until narms).map(x => (1.0,1.0)).toArray
       sums = (0 until narms).map(_ => initializationvalue).toArray // Initialization the weights to maximal gain forces to exploration at the early phase
