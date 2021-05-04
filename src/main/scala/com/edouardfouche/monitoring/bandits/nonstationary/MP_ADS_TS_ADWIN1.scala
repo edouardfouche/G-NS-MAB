@@ -23,6 +23,7 @@ case class MP_ADS_TS_ADWIN1(delta: Double)(val stream: Simulator, val reward: Re
   //var history: List[scala.collection.mutable.Map[Int,Double]] = List() // first el in the update for count, and last in the update for weight
   val cumulative_history: scala.collection.mutable.Map[Int,List[(Int,Double)]] =
     scala.collection.mutable.Map[Int,List[(Int,Double)]]()
+  (0 until narms).foreach(x => cumulative_history(x) = List[(Int,Double)]())
   var changedetected: Boolean = false // Just to flag whether there was a change in the iteration or not
   def epsilon(n:Int,m:Int): Double = math.sqrt(math.log(1.0/delta)/(2.0*n)) + math.sqrt(math.log(1.0/delta)/(2.0*m))
 
