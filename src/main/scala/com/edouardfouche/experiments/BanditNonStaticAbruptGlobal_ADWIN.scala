@@ -19,6 +19,7 @@ package com.edouardfouche.experiments
 import breeze.linalg
 import breeze.stats.distributions.{RandBasis, ThreadLocalRandomGenerator}
 import com.edouardfouche.experiments.BanditNonStaticAbruptGlobal.d
+import com.edouardfouche.experiments.BanditNonStaticGradualGlobal_ADWIN.info
 import com.edouardfouche.monitoring.bandits.nonstationary._
 import com.edouardfouche.monitoring.bandits.oracles.{OracleAbruptGlobal, OracleDynamic, OracleRandom, OracleStatic}
 import com.edouardfouche.monitoring.rewards.AbsoluteThreshold
@@ -38,15 +39,7 @@ object BanditNonStaticAbruptGlobal_ADWIN extends BanditExperiment {
 
   val attributes = List("bandit","dataset","scalingstrategy","k","gain","cputime", "historylength", "iteration")
   val reward = AbsoluteThreshold(1)
-
-  val generators: Array[AbruptGlobalGenerator] = Array(
-    //AbruptChangesGenerator(1, d),
-    //AbruptChangesGenerator(2, d),
-    //AbruptChangesGenerator(5, d),
-    //AbruptChangesGenerator(10, d)
-    AbruptGlobalGenerator(d)
-  )
-
+  val generator = AbruptGlobalGenerator(d)
   val nRep = 5
 
   val scalingstrategies: Array[ScalingStrategy] = Array(
@@ -79,6 +72,7 @@ object BanditNonStaticAbruptGlobal_ADWIN extends BanditExperiment {
     MP_ADR_Elimination_UCB(0.001)(_,_,_,_),
   )
 
+
   override def run(): Unit = {
     info(s"${formatter.format(java.util.Calendar.getInstance().getTime)} - Starting com.edouardfouche.experiments - ${this.getClass.getSimpleName}")
     // display parameters
@@ -90,65 +84,61 @@ object BanditNonStaticAbruptGlobal_ADWIN extends BanditExperiment {
     //info(s"reward: ${reward.name}")
     info(s"nRep: ${nRep}")
 
+    val id= generator.id
+
+    info(s"Computing simulator for... $generator")
+    val simulators = (0 until nRep).par.map{x =>
+      val rand = new RandBasis(new ThreadLocalRandomGenerator(new MersenneTwister(x)))
+      CachedStreamSimulator(InternalDataRef(id, generator.generate(rand), "cache"))
+    }.toArray
+
     for {
-      generator <- generators
+      scalingstrategy <- scalingstrategies.par
     } {
-      val id= generator.id
-
-      info(s"Computing simulator for... $generator")
-      val simulators = (0 until nRep).par.map{x =>
-        val rand = new RandBasis(new ThreadLocalRandomGenerator(new MersenneTwister(x)))
-        CachedStreamSimulator(InternalDataRef(id, generator.generate(rand), "cache"))
-      }.toArray
-
-      for {
-        scalingstrategy <- scalingstrategies.par
+      for{
+        banditConstructor <- banditConstructors.zipWithIndex.par
       } {
-        for{
-          banditConstructor <- banditConstructors.zipWithIndex.par
+        var allgains: linalg.Vector[Double] = linalg.Vector((1 to simulators(0).nbatches).map(x => 0.0).toArray)
+        var allks: linalg.Vector[Double] = linalg.Vector((1 to simulators(0).nbatches).map(x => 0.0).toArray)
+        var allcpu: linalg.Vector[Double] = linalg.Vector((1 to simulators(0).nbatches).map(x => 0.0).toArray)
+        var allhistorylengths: linalg.Vector[Double] = linalg.Vector((1 to simulators(0).nbatches).map(x => 0.0).toArray)
+
+        for {
+          rep <- 0 until nRep
         } {
-          var allgains: linalg.Vector[Double] = linalg.Vector((1 to simulators(0).nbatches).map(x => 0.0).toArray)
-          var allks: linalg.Vector[Double] = linalg.Vector((1 to simulators(0).nbatches).map(x => 0.0).toArray)
-          var allcpu: linalg.Vector[Double] = linalg.Vector((1 to simulators(0).nbatches).map(x => 0.0).toArray)
-          var allhistorylengths: linalg.Vector[Double] = linalg.Vector((1 to simulators(0).nbatches).map(x => 0.0).toArray)
+          //info(s"Starting com.edouardfouche.experiments with data: ${d.id}, configuration k: ${kratio}, rep=$rep")
+          //val bandit = banditConstructor(streamsimulator.copy(), reward, scalingstrategy, scalingstrategy.k)
+          val bandit = banditConstructor._1(simulators(rep).copy(), reward, scalingstrategy, lmax)
+          if (rep % 1 == 0) info(s"Reached rep $rep with bandit ${bandit.name}, ${scalingstrategy.name}")
+          val (gains, ks, cpu, historylengths) = fullrunnerGainsKsCPUW(bandit, Array[Double](), Array[Int](), Array[Double](), Array[Double]())
+          allgains = allgains +:+ (breeze.linalg.Vector(gains) *:* (1.0/nRep))
+          allks = allks +:+ (breeze.linalg.Vector(ks.map(_.toDouble)) *:* (1.0/nRep))
+          allcpu = allcpu +:+ (breeze.linalg.Vector(cpu.map(_.toDouble)) *:* (1.0/nRep))
+          allhistorylengths = allhistorylengths +:+ (breeze.linalg.Vector(historylengths.map(_.toDouble)) *:* (1.0/nRep))
+        }
 
-          for {
-            rep <- 0 until nRep
-          } {
-            //info(s"Starting com.edouardfouche.experiments with data: ${d.id}, configuration k: ${kratio}, rep=$rep")
-            //val bandit = banditConstructor(streamsimulator.copy(), reward, scalingstrategy, scalingstrategy.k)
-            val bandit = banditConstructor._1(simulators(rep).copy(), reward, scalingstrategy, lmax)
-            if (rep % 1 == 0) info(s"Reached rep $rep with bandit ${bandit.name}, ${scalingstrategy.name}")
-            val (gains, ks, cpu, historylengths) = fullrunnerGainsKsCPUW(bandit, Array[Double](), Array[Int](), Array[Double](), Array[Double]())
-            allgains = allgains +:+ (breeze.linalg.Vector(gains) *:* (1.0/nRep))
-            allks = allks +:+ (breeze.linalg.Vector(ks.map(_.toDouble)) *:* (1.0/nRep))
-            allcpu = allcpu +:+ (breeze.linalg.Vector(cpu.map(_.toDouble)) *:* (1.0/nRep))
-            allhistorylengths = allhistorylengths +:+ (breeze.linalg.Vector(historylengths.map(_.toDouble)) *:* (1.0/nRep))
-          }
-
-          val bandit = banditConstructor._1(simulators(0), reward, scalingstrategy, lmax)
-          for{
-            step <- 0 until allgains.length
-          }{
-            val summary = ExperimentSummary(attributes)
-            // this is the list of all the data possible we can record, "attributes" is usually a subset of it
-            // val attributes = List("bandit","dataset","action","reward","scaling","windowSize","stepSize",
-            // "delta","gamma","k","banditk","narms","gain","matrixdiff","cpuTime","wallTime","iteration","nrep")
-            summary.add("bandit", bandit.name)
-            summary.add("dataset", bandit.stream.dataset.id)
-            summary.add("scalingstrategy", bandit.scalingstrategy.name)
-            summary.add("k",  "%.2f".format(allks(step)))
-            summary.add("gain",  "%.2f".format(allgains(step)))
-            //summary.add("confidence", allconfs(step))
-            //summary.add("gamma", bandit.scalingstrategy.gamma)
-            summary.add("cputime", "%.4f".format(allcpu(step)))
-            summary.add("historylength", "%.4f".format(allhistorylengths(step)))
-            summary.add("iteration", step)
-            summary.write(summaryPath)
-          }
+        val bandit = banditConstructor._1(simulators(0), reward, scalingstrategy, lmax)
+        for{
+          step <- 0 until allgains.length
+        }{
+          val summary = ExperimentSummary(attributes)
+          // this is the list of all the data possible we can record, "attributes" is usually a subset of it
+          // val attributes = List("bandit","dataset","action","reward","scaling","windowSize","stepSize",
+          // "delta","gamma","k","banditk","narms","gain","matrixdiff","cpuTime","wallTime","iteration","nrep")
+          summary.add("bandit", bandit.name)
+          summary.add("dataset", bandit.stream.dataset.id)
+          summary.add("scalingstrategy", bandit.scalingstrategy.name)
+          summary.add("k",  "%.2f".format(allks(step)))
+          summary.add("gain",  "%.2f".format(allgains(step)))
+          //summary.add("confidence", allconfs(step))
+          //summary.add("gamma", bandit.scalingstrategy.gamma)
+          summary.add("cputime", "%.4f".format(allcpu(step)))
+          summary.add("historylength", "%.4f".format(allhistorylengths(step)))
+          summary.add("iteration", step)
+          summary.write(summaryPath)
         }
       }
     }
-    info(s"End of experiment ${this.getClass.getSimpleName} - ${formatter.format(java.util.Calendar.getInstance().getTime)}")
+    info(s"End of experiment")// ${this.getClass.getSimpleName} - ${formatter.format(java.util.Calendar.getInstance().getTime)}")
   }
 }
