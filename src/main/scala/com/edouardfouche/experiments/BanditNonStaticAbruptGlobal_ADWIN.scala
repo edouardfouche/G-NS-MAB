@@ -72,7 +72,6 @@ object BanditNonStaticAbruptGlobal_ADWIN extends BanditExperiment {
     MP_ADR_Elimination_UCB(0.001)(_,_,_,_),
   )
 
-
   override def run(): Unit = {
     info(s"${formatter.format(java.util.Calendar.getInstance().getTime)} - Starting com.edouardfouche.experiments - ${this.getClass.getSimpleName}")
     // display parameters

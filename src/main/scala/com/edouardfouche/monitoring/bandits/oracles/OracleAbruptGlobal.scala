@@ -32,7 +32,7 @@ case class OracleAbruptGlobal(stream: Simulator, reward: Reward, scalingstrategy
     partA ++ partB ++ partC
   }
   val all_arms = cols.transpose
-  val all_arms_sorted: Array[Array[Int]] = all_arms.map(x => x.zipWithIndex.sortBy(x => x._1).map(x => x._2))
+  val all_arms_sorted: Array[Array[Int]] = all_arms.map(x => x.zipWithIndex.sortBy(x => -x._1).map(x => x._2))
 
   var position = 0
   val horizon = stream.nbatches

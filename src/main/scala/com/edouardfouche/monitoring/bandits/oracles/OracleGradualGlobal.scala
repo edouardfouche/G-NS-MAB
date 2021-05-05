@@ -24,7 +24,7 @@ case class OracleGradualGlobal(stream: Simulator, reward: Reward, scalingstrateg
   val means = a.reverse
 
   val cols: Array[Array[Double]] = means.zipWithIndex.map{x =>
-    val partA: Array[Double] = (0 until n/2).toArray.map {y =>
+    val partA: Array[Double] = (0 until n).toArray.map {y =>
       x._1*((n-y)/n) + (1-x._1)*(y/n)
     }
     //val partB: Array[Double] = (0 until n/2).toArray.map{y =>
@@ -33,7 +33,7 @@ case class OracleGradualGlobal(stream: Simulator, reward: Reward, scalingstrateg
     partA //++ partB
   }
   val all_arms = cols.transpose
-  val all_arms_sorted: Array[Array[Int]] = all_arms.map(x => x.zipWithIndex.sortBy(x => x._1).map(x => x._2))
+  val all_arms_sorted: Array[Array[Int]] = all_arms.map(x => x.zipWithIndex.sortBy(x => -x._1).map(x => x._2))
 
   var position = 0
   val horizon = stream.nbatches
