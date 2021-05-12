@@ -25,7 +25,7 @@ case class OracleGradualGlobal(stream: Simulator, reward: Reward, scalingstrateg
 
   val cols: Array[Array[Double]] = means.zipWithIndex.map{x =>
     val partA: Array[Double] = (0 until n).toArray.map {y =>
-      x._1*((n-y)/n) + (1-x._1)*(y/n)
+      x._1*((n-y).toDouble/n.toDouble) + (1-x._1)*(y.toDouble/n.toDouble)
     }
     //val partB: Array[Double] = (0 until n/2).toArray.map{y =>
     //  (1-x._1)*(((n/2)-y)/(n/2)) + x._1*(y/(n/2))

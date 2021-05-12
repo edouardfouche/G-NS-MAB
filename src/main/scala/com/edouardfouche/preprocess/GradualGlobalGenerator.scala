@@ -39,7 +39,7 @@ case class GradualGlobalGenerator(d: Int = 100) extends Scenario{
 
     val cols: Array[Array[Double]] = means.zipWithIndex.map{x =>
       val partA: Array[Double] = (0 until n).toArray.map {y =>
-        val b = new Bernoulli(x._1*((n-y)/n) + (1-x._1)*(y/n))(rand)
+        val b = new Bernoulli(x._1*((n-y).toDouble/n.toDouble) + (1-x._1)*(y.toDouble/n.toDouble))(rand)
         if (b.draw()) 1.0 else 0.0
       }
       //val partB: Array[Double] = (0 until n/2).toArray.map{y =>
