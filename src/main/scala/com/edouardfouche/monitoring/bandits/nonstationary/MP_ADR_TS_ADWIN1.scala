@@ -19,7 +19,7 @@ import com.edouardfouche.streamsimulator.Simulator
   * @param k the initial number of pull per round
   */
 case class MP_ADR_TS_ADWIN1(delta: Double)(val stream: Simulator, val reward: Reward, val scalingstrategy: ScalingStrategy, var k: Int) extends BanditTS with BanditAdwin {
-  val name = s"MP-ADS-TS-ADWIN1; d=$delta"
+  val name = s"MP-ADR-TS-ADWIN1; d=$delta"
 
   //var history: List[scala.collection.mutable.Map[Int,Double]] = List() // first el in the update for count, and last in the update for weight
   var cumulative_history: scala.collection.mutable.Map[Int,List[(Int,Double)]] =
@@ -64,12 +64,18 @@ case class MP_ADR_TS_ADWIN1(delta: Double)(val stream: Simulator, val reward: Re
     // ADWIN1 change detection
     (0 until narms).foreach { x =>
       if(cumulative_history(x).length > 10) {
-        val (nt,st) = cumulative_history(x).last
-        changedetected = true
-        while(changedetected || (cumulative_history(x).length <= 10)) { // Do this until no change is detected or window is too small
-          changedetected = false
-          for(y <- cumulative_history(x)) if(math.abs(y._2/y._1 - (y._2-st)/(y._1-nt)) > epsilon(y._1, nt - y._1)) changedetected = true
-          if(changedetected) cumulative_history(x) = cumulative_history(x).tail // delete oldest sample
+        if(t % 10 == 0) {
+          val (nt,st) = cumulative_history(x).last
+          changedetected = true
+          while(changedetected && (cumulative_history(x).length > 10)) { // Do this until no change is detected or window is too small
+            changedetected = false
+            for (y <- cumulative_history(x)) {
+              if (math.abs((y._2 / y._1.toDouble) - (y._2 - st) / (y._1.toDouble - nt.toDouble)) > epsilon(y._1, nt - y._1)) {
+                changedetected = true
+              }
+            }
+            if(changedetected) cumulative_history(x) = cumulative_history(x).tail // delete oldest sample
+          }
         }
       }
     }
