@@ -64,16 +64,16 @@ case class MP_ADS_TS_ADWIN1(delta: Double)(val stream: Simulator, val reward: Re
     (0 until narms).foreach { x =>
       if(cumulative_history(x).length > 10) {
         if(t % 10 == 0) {
-          val (nt, st) = cumulative_history(x).last
+          val (nt, st): (Int, Double) = cumulative_history(x).last
           changedetected = true
-          while (changedetected && (cumulative_history(x).length > 10)) { // Do this until no change is detected or window is too small
+          while(changedetected && (cumulative_history(x).length > 10)) { // Do this until no change is detected or window is too small
             changedetected = false
-            for (y <- cumulative_history(x)) {
-              if (math.abs((y._2 / y._1.toDouble) - (y._2 - st) / (y._1.toDouble - nt.toDouble)) > epsilon(y._1, nt - y._1)) {
+            for (y <- cumulative_history(x).init) {
+              if (math.abs((y._2 / y._1.toDouble) - (st - y._2) / (nt.toDouble - y._1.toDouble)) > epsilon(y._1, nt - y._1)) {
                 changedetected = true
               }
             }
-            if (changedetected) cumulative_history(x) = cumulative_history(x).tail // delete oldest sample
+            if(changedetected) cumulative_history(x) = cumulative_history(x).tail // delete oldest sample
           }
         }
       }
