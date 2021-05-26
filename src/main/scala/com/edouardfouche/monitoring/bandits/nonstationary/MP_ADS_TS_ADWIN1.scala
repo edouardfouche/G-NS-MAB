@@ -91,6 +91,7 @@ case class MP_ADS_TS_ADWIN1(delta: Double)(val stream: Simulator, val reward: Re
       } {
         val rollback = history.head
         history = history.tail
+        (0 until narms).foreach {y => cumulative_history(y) = cumulative_history(y).tail}
         for((key,value) <- rollback) {
           sums(key) = sums(key) - value // if(counts(key) == 1.0) 1.0 else weights(key) - (1.0/(counts(key)-1.0))*(value._1 - weights(key))
           counts(key) = counts(key) - 1 //- value._2
