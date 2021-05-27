@@ -442,7 +442,6 @@ public class ADWIN { //extends Estimator {
         return (Math.abs(absvalue)>epsilon);
     }
 
-
     public ADWIN()
     {
         mdbldelta=DELTA;
