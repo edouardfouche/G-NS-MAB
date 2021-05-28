@@ -81,18 +81,30 @@ case class MP_ADS_TS_ADWIN1(delta: Double)(val stream: Simulator, val reward: Re
 
     // Here we, add up the size of the adwin (those are the number of pulls) and the number of unpulls, to get the
     // actual size of window each arm.
-    val windows = (0 until narms).map(x => (x, cumulative_history(x).length + (history.length-counts(x))))
-    val smallest_window = windows.minBy(_._2) // this is the smallest window
+    val windows: Array[Int] = (0 until narms).map(x => (cumulative_history(x).length + (history.length-counts(x))).toInt).toArray
+    val smallest_window: Int = windows.min // this is the smallest window
 
-    // Rolling back
-    if(smallest_window._2.toInt < history.length-1) {
+    // Rolling back on the ADWIN knowledge
+    for {
+      x <-  (0 until narms)
+    } {
+      if(windows(x) > smallest_window) {
+        for{
+          y <- smallest_window until windows(x)
+        } {
+          cumulative_history(x) = cumulative_history(x).tail
+        }
+      }
+    }
+
+    // Rolling back on the bandits knowledge
+    if(smallest_window < history.length-1) {
       for{
-        x <- smallest_window._2.toInt until history.length
+        x <- smallest_window until history.length
       } {
         val rollback = history.head
         history = history.tail
         for((key,value) <- rollback) {
-          cumulative_history(key) = cumulative_history(key).tail
           sums(key) = sums(key) - value // if(counts(key) == 1.0) 1.0 else weights(key) - (1.0/(counts(key)-1.0))*(value._1 - weights(key))
           counts(key) = counts(key) - 1 //- value._2
           beta_params(key) = (beta_params(key)._1-value, beta_params(key)._2-(1.0-value))

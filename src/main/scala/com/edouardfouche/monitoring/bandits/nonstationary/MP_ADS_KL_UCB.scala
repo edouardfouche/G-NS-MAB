@@ -67,6 +67,19 @@ case class MP_ADS_KL_UCB(delta: Double)(val stream: Simulator, val reward: Rewar
 
     val smallest_window = windows.minBy(_._2) // this is the smallest window
 
+    // Rolling back on the ADWIN knowledge
+    for {
+      x <-  (0 until narms)
+    } {
+      if(windows(x)._2.toInt > smallest_window._2.toInt) {
+        for{
+          y <- smallest_window._2.toInt until windows(x)._2.toInt
+        } {
+          sharedAdwin.deleteElement(x)
+        }
+      }
+    }
+
     // Rolling back
     if(smallest_window._2.toInt < history.length-1) {
       for{
