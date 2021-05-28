@@ -68,6 +68,7 @@ case class MP_ADS_KL_UCB(delta: Double)(val stream: Simulator, val reward: Rewar
     val smallest_window = windows.minBy(_._2) // this is the smallest window
 
     // Rolling back on the ADWIN knowledge
+    /*
     for {
       x <-  (0 until narms)
     } {
@@ -79,6 +80,7 @@ case class MP_ADS_KL_UCB(delta: Double)(val stream: Simulator, val reward: Rewar
         }
       }
     }
+     */
 
     // Rolling back
     if(smallest_window._2.toInt < history.length-1) {
@@ -90,6 +92,10 @@ case class MP_ADS_KL_UCB(delta: Double)(val stream: Simulator, val reward: Rewar
         for((key,value) <- rollback) {
           sums(key) = sums(key) - value // if(counts(key) == 1.0) 1.0 else weights(key) - (1.0/(counts(key)-1.0))*(value._1 - weights(key))
           counts(key) = counts(key) - 1 //- value._2
+          // As we backtrack, check whether the play was deleted already, otherwise delete it
+          if((sharedAdwin.getSingleSize(key) + (history.length-counts(key))).toInt > history.length) {
+            sharedAdwin.deleteElement(key)
+          }
         }
       }
     }

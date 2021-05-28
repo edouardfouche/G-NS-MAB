@@ -61,6 +61,7 @@ case class MP_ADS_UCB(delta: Double)(val stream: Simulator, val reward: Reward, 
     val smallest_window = windows.minBy(_._2) // this is the smallest window
 
     // Rolling back on the ADWIN knowledge
+    /*
     for {
       x <-  (0 until narms)
     } {
@@ -72,6 +73,7 @@ case class MP_ADS_UCB(delta: Double)(val stream: Simulator, val reward: Reward, 
         }
       }
     }
+     */
 
     // Rolling back
     if(smallest_window._2.toInt < history.length-1) {
@@ -83,6 +85,9 @@ case class MP_ADS_UCB(delta: Double)(val stream: Simulator, val reward: Reward, 
         for((key,value) <- rollback) {
           sums(key) = sums(key) - value
           counts(key) = counts(key) - 1
+          if((sharedAdwin.getSingleSize(key) + (history.length-counts(key))).toInt > history.length) {
+            sharedAdwin.deleteElement(key)
+          }
         }
       }
     }

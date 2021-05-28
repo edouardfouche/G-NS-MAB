@@ -32,7 +32,7 @@ class SharedAdwin(k: Int, val delta: Double = 0.1) {
 
   def addElement(x: Int, element: Double) = adwins(x).setInput(element)
 
-  def deleteElement(x: Int) = adwins(x).deleteElement()
+  def deleteElement(x: Int) = adwins(x).deleteElement() // if(adwins(x).getWidth > 0)
 
   def getSize: Int = (0 until k).map(x => adwins(x).getWidth).min
 

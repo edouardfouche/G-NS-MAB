@@ -85,6 +85,7 @@ case class MP_ADS_TS_ADWIN1(delta: Double)(val stream: Simulator, val reward: Re
     val smallest_window: Int = windows.min // this is the smallest window
 
     // Rolling back on the ADWIN knowledge
+    /*
     for {
       x <-  (0 until narms)
     } {
@@ -96,6 +97,7 @@ case class MP_ADS_TS_ADWIN1(delta: Double)(val stream: Simulator, val reward: Re
         }
       }
     }
+     */
 
     // Rolling back on the bandits knowledge
     if(smallest_window < history.length-1) {
@@ -108,6 +110,10 @@ case class MP_ADS_TS_ADWIN1(delta: Double)(val stream: Simulator, val reward: Re
           sums(key) = sums(key) - value // if(counts(key) == 1.0) 1.0 else weights(key) - (1.0/(counts(key)-1.0))*(value._1 - weights(key))
           counts(key) = counts(key) - 1 //- value._2
           beta_params(key) = (beta_params(key)._1-value, beta_params(key)._2-(1.0-value))
+          // As we backtrack, check whether the play was deleted already, otherwise delete it
+          if((cumulative_history(key).length + (history.length-counts(key))).toInt > history.length) {
+            cumulative_history(key) = cumulative_history(key).tail
+          }
         }
       }
     }
