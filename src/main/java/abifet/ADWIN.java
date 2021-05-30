@@ -397,6 +397,7 @@ public class ADWIN { //extends Estimator {
 
                         if (i==0 && k==cursor.bucketSizeRow-1) { blnExit=true;break;}
                         double absvalue=(double) (u0/n0)-(u1/n1);       //n1<WIDTH-mintMinWinLength-1
+                        //double absvalue=(double) Math.abs((u0/n0)-(u1/n1)); // Change for Komiyama/Fouché study
                         if ((n1>mintMinWinLength+1 && n0>mintMinWinLength+1 )&&  // Diference NEGATIVE
                                 //if(
                                 blnCutexpression(n0,n1,u0,u1,v0,v1,absvalue,delta) ){
@@ -432,14 +433,17 @@ public class ADWIN { //extends Estimator {
         return blnChange;
     }
     private boolean blnCutexpression(int n0,int n1,double u0,double u1,double v0,double v1,double absvalue,double delta){
-        int n=getWidth();
-        double dd = Math.log(2*Math.log(n)/delta);     // -- ull perque el ln n va al numerador.
+        //int n=getWidth();
+        //double dd = Math.log(2*Math.log(n)/delta);     // -- ull perque el ln n va al numerador.
         // Formula Gener 2008
-        double v= getVariance();
-        double m= ((double)1/((n0-mintMinWinLength+1)))+ ((double)1/((n1-mintMinWinLength+1)));
-        double epsilon= Math.sqrt(2*m*v*dd)+(double) 2/3 *dd* m;
+        //double v= getVariance();
+        //double m= ((double)1/((n0-mintMinWinLength+1)))+ ((double)1/((n1-mintMinWinLength+1)));
+        //double epsilon= Math.sqrt(2*m*v*dd)+(double) 2/3 *dd* m;
+        //return (abs(absvalue)>epsilon);
 
-        return (Math.abs(absvalue)>epsilon);
+        // Change for Komiyama/Fouché study
+        double eps = Math.sqrt(((double)1/(double)2*n0) * Math.log((double)1/delta)) + Math.sqrt(((double)1/(double)2*n1) * Math.log((double)1/delta));
+        return (Math.abs(absvalue)>eps);
     }
 
     public ADWIN()
