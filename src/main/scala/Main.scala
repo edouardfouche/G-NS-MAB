@@ -63,35 +63,37 @@ object Main extends LazyLogging {
   }
 
   def experimentFactory(arg: String): Unit = arg match {
-    case "com.edouardfouche.experiments.BanditAbrupt" => BanditNonStaticAbrupt.run()
-    case "com.edouardfouche.experiments.BanditGradual" => BanditNonStaticGradual.run()
-    case "com.edouardfouche.experiments.BanditStatic" => BanditStatic.run()
-    case "com.edouardfouche.experiments.BanditExtra" => {
+    case "BanditAbrupt" => BanditNonStaticAbrupt.run()
+    case "BanditGradual" => BanditNonStaticGradual.run()
+    case "BanditStatic" => BanditStatic.run()
+
+    case "BanditGlobal" => {
       BanditNonStaticGradualGlobal_ADWIN.run()
       BanditNonStaticAbruptGlobal_ADWIN.run()
-      //BanditNonStaticGradualGlobal.run()
-      //BanditNonStaticAbruptGlobal.run()
+      BanditNonStaticGradualGlobal.run()
+      BanditNonStaticAbruptGlobal.run()
     }
-    case "com.edouardfouche.experiments.BanditNonStaticGradualGlobal_ADWIN" => BanditNonStaticGradualGlobal_ADWIN.run()
-    case "com.edouardfouche.experiments.BanditNonStaticAbruptGlobal_ADWIN" => BanditNonStaticAbruptGlobal_ADWIN.run()
-    case "com.edouardfouche.experiments.BanditNonStaticGradualGlobal" => BanditNonStaticGradualGlobal.run()
-    case "com.edouardfouche.experiments.BanditNonStaticAbruptGlobal" => BanditNonStaticAbruptGlobal.run()
 
-    case "com.edouardfouche.experiments.BanditSynthetic" => {
+    case "BanditNonStaticGradualGlobal_ADWIN" => BanditNonStaticGradualGlobal_ADWIN.run()
+    case "BanditNonStaticAbruptGlobal_ADWIN" => BanditNonStaticAbruptGlobal_ADWIN.run()
+    case "BanditNonStaticGradualGlobal" => BanditNonStaticGradualGlobal.run()
+    case "BanditNonStaticAbruptGlobal" => BanditNonStaticAbruptGlobal.run()
+
+    case "BanditSynthetic" => {
       BanditNonStaticAbrupt.run()
       BanditNonStaticGradual.run()
       BanditStatic.run()
       //BanditNonStaticGlobal.run()
     }
-    case "com.edouardfouche.experiments.BanditRealWorld" => {
+    case "BanditRealWorld" => {
       BanditRealWorld_Bioliq.run()
       BanditRealWorld_Zozo_minus.run()
     }
-    case "com.edouardfouche.experiments.BanditRealWorld_Zozo_minus" => BanditRealWorld_Zozo_minus.run()
-    case "com.edouardfouche.experiments.BanditRealWorld_Zozo" => BanditRealWorld_Zozo.run()
-    case "com.edouardfouche.experiments.BanditRealWorld_Bioliq" => BanditRealWorld_Bioliq.run()
-    case "com.edouardfouche.experiments.BanditRealWorld_Bioliq_test" => BanditRealWorld_Bioliq_test.run()
-    case "com.edouardfouche.experiments.BanditRealWorld_Bioliq_ADWIN" => BanditRealWorld_Bioliq_ADWIN.run()
+    case "BanditRealWorld_Zozo_minus" => BanditRealWorld_Zozo_minus.run()
+    case "BanditRealWorld_Zozo" => BanditRealWorld_Zozo.run()
+    case "BanditRealWorld_Bioliq" => BanditRealWorld_Bioliq.run()
+    case "BanditRealWorld_Bioliq_test" => BanditRealWorld_Bioliq_test.run()
+    case "BanditRealWorld_Bioliq_ADWIN" => BanditRealWorld_Bioliq_ADWIN.run()
     case _ => throw new Error(s"Unknown experiment $arg")
   }
 
