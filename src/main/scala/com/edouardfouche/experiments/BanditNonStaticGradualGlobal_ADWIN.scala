@@ -38,7 +38,7 @@ object BanditNonStaticGradualGlobal_ADWIN extends BanditExperiment {
   val attributes = List("bandit","dataset","scalingstrategy","k","gain","cputime", "historylength", "iteration")
   val reward = AbsoluteThreshold(1)
   val generator = GradualGlobalGenerator(d)
-  val nRep = 5
+  val nRep = 100
 
   val scalingstrategies: Array[ScalingStrategy] = Array(
     //NoScaling(10),

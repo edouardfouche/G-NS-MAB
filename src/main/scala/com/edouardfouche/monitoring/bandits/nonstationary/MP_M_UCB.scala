@@ -25,7 +25,9 @@ case class MP_M_UCB(windowsize: Int, nchanges: Int)(val stream: Simulator, val r
   override val logfactor = 2
   val name = s"MP-M-UCB; w=$windowsize; m=$nchanges"
 
-  var historyarm: Array[List[Double]] = (0 until narms).map(_ => List[Double]()).toArray
+  //var historyarm: Array[List[Double]] = (0 until narms).map(_ => List[Double]()).toArray
+  var cumulative_history: scala.collection.mutable.Map[Int,Array[(Int,Double)]] =
+    collection.mutable.Map((0 until narms).map(x => x -> Array[(Int,Double)]()).toMap.toSeq: _*)
 
   val horizon: Int = stream.nbatches
   val b = math.sqrt((windowsize/2)*math.log(2*narms*math.pow(horizon,2)))
@@ -35,7 +37,9 @@ case class MP_M_UCB(windowsize: Int, nchanges: Int)(val stream: Simulator, val r
 
   override def reset: Unit = {
     super.reset
-    historyarm = (0 until narms).map(_ => List[Double]()).toArray
+    //historyarm = (0 until narms).map(_ => List[Double]()).toArray
+    var cumulative_history: scala.collection.mutable.Map[Int,Array[(Int,Double)]] =
+      collection.mutable.Map((0 until narms).map(x => x -> Array[(Int,Double)]()).toMap.toSeq: _*)
   }
 
   // return a vector a 2-tuples (arms) and a gain
@@ -71,7 +75,9 @@ case class MP_M_UCB(windowsize: Int, nchanges: Int)(val stream: Simulator, val r
       currentMatrix(x._1) = x._2 // replace
       counts(x._1) += 1.0
       sums(x._1) += d
-      historyarm(x._1) = historyarm(x._1) :+ d // Keep history of rewards for each arm
+      //historyarm(x._1) = historyarm(x._1) :+ d // Keep history of rewards for each arm
+      val lastelement: (Int, Double) = if(cumulative_history(x._1).isEmpty) (0,0.0) else cumulative_history(x._1).last
+      cumulative_history(x._1) = cumulative_history(x._1) :+ (lastelement._1 + 1, lastelement._2 + d)
       d
     })
     t = t + 1
@@ -79,9 +85,11 @@ case class MP_M_UCB(windowsize: Int, nchanges: Int)(val stream: Simulator, val r
     k = scalingstrategy.scale(gains, indexes, sums, counts, t)
 
     (0 until narms).foreach { x =>
-      if(counts(x) >= windowsize) {
-        val w1 = historyarm(x).slice(historyarm(x).length-(windowsize/2+1)+1,historyarm(x).length).sum
-        val w2 = historyarm(x).slice(historyarm(x).length-windowsize,historyarm(x).length-(windowsize/2+1)+1).sum
+      if(counts(x) > windowsize) {
+        val w1 = cumulative_history(x).last._2 - cumulative_history(x)(cumulative_history(x).length-(windowsize/2)-1)._2
+        val w2 = cumulative_history(x)(cumulative_history(x).length-(windowsize/2)-1)._2 - cumulative_history(x)(cumulative_history(x).length-windowsize-1)._2
+        //val w1 = historyarm(x).slice(historyarm(x).length-(windowsize/2+1)+1,historyarm(x).length).sum
+        //val w2 = historyarm(x).slice(historyarm(x).length-windowsize,historyarm(x).length-(windowsize/2+1)+1).sum
         if(math.abs(w1-w2) > b) { // Detect a change
           changedetected = true
           //println(s"Change detected at time $t on arm $x")
@@ -96,7 +104,8 @@ case class MP_M_UCB(windowsize: Int, nchanges: Int)(val stream: Simulator, val r
       (0 until narms).foreach { x => // reinitialize all the arms
         counts(x) = initializationvalue
         sums(x) = initializationvalue
-        historyarm(x) = List[Double]()
+        //historyarm(x) = List[Double]()
+        cumulative_history(x) = Array[(Int, Double)]() //reset entire memory for this arm
       }
     }
 

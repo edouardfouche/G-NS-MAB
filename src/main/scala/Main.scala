@@ -72,6 +72,7 @@ object Main extends LazyLogging {
       BanditNonStaticGradualGlobal_ADWIN.run()
       BanditNonStaticAbruptGlobal.run()
       BanditNonStaticGradualGlobal.run()
+      BanditStatic.run()
     }
 
     case "BanditNonStaticGradualGlobal_ADWIN" => BanditNonStaticGradualGlobal_ADWIN.run()

@@ -17,7 +17,7 @@
 package com.edouardfouche.experiments
 
 import com.edouardfouche.monitoring.bandits.adversarial._
-import com.edouardfouche.monitoring.bandits.nonstationary.{MP_ADR_Elimination_UCB, MP_ADR_TS, MP_ADS_TS, MP_D_TS, MP_D_UCB, MP_E_Greedy, MP_GLR_KL_UCB_G, MP_GLR_KL_UCB_G_F, MP_GLR_KL_UCB_L, MP_GLR_KL_UCB_L_F, MP_M_UCB, MP_SW_TS, MP_SW_UCB, MP_SW_UCB_SHARP_A, MP_SW_UCB_SHARP_G}
+import com.edouardfouche.monitoring.bandits.nonstationary.{MP_ADR_Elimination_UCB, MP_ADR_TS, MP_ADS_TS, MP_ADS_TS_ADWIN1, MP_D_TS, MP_D_UCB, MP_E_Greedy, MP_GLR_KL_UCB_G, MP_GLR_KL_UCB_G_F, MP_GLR_KL_UCB_L, MP_GLR_KL_UCB_L_F, MP_M_UCB, MP_SW_TS, MP_SW_UCB, MP_SW_UCB_SHARP_A, MP_SW_UCB_SHARP_G}
 import com.edouardfouche.monitoring.bandits.oracles.{OracleDynamic, OracleRandom, OracleStatic}
 import com.edouardfouche.monitoring.bandits.stationary._
 import com.edouardfouche.monitoring.scalingstrategies._
@@ -34,7 +34,7 @@ object BanditStatic extends BanditSyntheticExperiment {
 
   val generator= StaticGenerator(d)
 
-  val nRep = 5
+  val nRep = 100
 
   val scalingstrategies: Array[ScalingStrategy] = Array(
     //NoScaling(10),
@@ -87,14 +87,20 @@ object BanditStatic extends BanditSyntheticExperiment {
     //Exp3M_ADWIN(0.1)(_,_,_,_),
 
     // Ours
-    MP_ADS_TS(0.1)(_,_,_,_),
-    MP_ADS_TS(0.01)(_,_,_,_),
-    MP_ADS_TS(0.001)(_,_,_,_),
-    MP_ADR_TS(0.1)(_,_,_,_),
-    MP_ADR_TS(0.01)(_,_,_,_),
-    MP_ADR_TS(0.001)(_,_,_,_),
+    MP_ADS_TS_ADWIN1(0.1)(_,_,_,_),
+    MP_ADS_TS_ADWIN1(0.01)(_,_,_,_),
+    MP_ADS_TS_ADWIN1(0.001)(_,_,_,_),
+    MP_ADS_TS_ADWIN1(0.0001)(_,_,_,_),
+    MP_ADS_TS_ADWIN1(0.00001)(_,_,_,_),
+    MP_ADS_TS_ADWIN1(0.1,ADR=true)(_,_,_,_),
+    MP_ADS_TS_ADWIN1(0.01,ADR=true)(_,_,_,_),
+    MP_ADS_TS_ADWIN1(0.001,ADR=true)(_,_,_,_),
+    MP_ADS_TS_ADWIN1(0.0001,ADR=true)(_,_,_,_),
+    MP_ADS_TS_ADWIN1(0.00001,ADR=true)(_,_,_,_),
     MP_ADR_Elimination_UCB(0.1)(_,_,_,_),
     MP_ADR_Elimination_UCB(0.01)(_,_,_,_),
     MP_ADR_Elimination_UCB(0.001)(_,_,_,_),
+    MP_ADR_Elimination_UCB(0.0001)(_,_,_,_),
+    MP_ADR_Elimination_UCB(0.00001)(_,_,_,_),
   )
 }

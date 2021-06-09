@@ -34,7 +34,7 @@ object BanditNonStaticGradualGlobal extends BanditSyntheticExperiment {
 
   val generator= GradualGlobalGenerator(d)
 
-  val nRep = 5
+  val nRep = 100
 
   val scalingstrategies: Array[ScalingStrategy] = Array(
     //NoScaling(10),

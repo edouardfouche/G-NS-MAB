@@ -26,7 +26,9 @@ import scala.util.Random
 case class MP_GLR_KL_UCB_L(val stream: Simulator, val reward: Reward, val scalingstrategy: ScalingStrategy, var k: Int) extends BanditKLUCB {
   val name = "MP-GLR-KL-UCB-L"
 
-  var historyarm: Array[List[Double]] = (0 until narms).map(_ => List[Double]()).toArray
+  //var historyarm: Array[List[Double]] = (0 until narms).map(_ => List[Double]()).toArray
+  var cumulative_history: scala.collection.mutable.Map[Int,Array[(Int,Double)]] =
+    collection.mutable.Map((0 until narms).map(x => x -> Array[(Int,Double)]()).toMap.toSeq: _*)
 
   val deltas = 5 // smallest window considered
   val deltat = 10 // check for change every deltat time steps
@@ -68,7 +70,9 @@ case class MP_GLR_KL_UCB_L(val stream: Simulator, val reward: Reward, val scalin
       currentMatrix(x._1) = x._2 // replace
       counts(x._1) += 1
       sums(x._1) += d
-      historyarm(x._1) = historyarm(x._1) :+ d // Keep history of rewards for each arm
+      //historyarm(x._1) = historyarm(x._1) :+ d // Keep history of rewards for each arm
+      val lastelement: (Int, Double) = if(cumulative_history(x._1).isEmpty) (0,0.0) else cumulative_history(x._1).last
+      cumulative_history(x._1) = cumulative_history(x._1) :+ (lastelement._1 + 1, lastelement._2 + d)
       d
     })
     t = t + 1
@@ -83,26 +87,26 @@ case class MP_GLR_KL_UCB_L(val stream: Simulator, val reward: Reward, val scalin
 
       (0 until narms).foreach { x =>
         // if we don't change anything (no observation), there will be no change too
-        if(((historyarm(x).length-1) % deltat == 0) && (historyarm(x).length >= deltat)) { // Try to detect changes only every deltat time steps
-          val ncheck = math.floor(historyarm(x).length / deltas).toInt-1 // This is the number of window pairs we are going to check
-          val beta: Double = math.log(math.pow(historyarm(x).length,(3/2))/delta)
+        if(((cumulative_history(x).length-1) % deltat == 0) && (cumulative_history(x).length >= deltat)) {
+          val ncheck = math.floor(cumulative_history(x).length / deltas).toInt-1 // This is the number of window pairs we are going to check
+          val beta: Double = math.log(math.pow(cumulative_history(x).length,(3/2))/delta)
           var glr:Double = 0.0
 
           val tocheck = (1 to ncheck).toList
 
           for(y <- tocheck) {
             val s = y*deltas // number of points in first window
-            val mu1 = historyarm(x).slice(0, s).sum / s
-            val mu2 = historyarm(x).slice(s, historyarm(x).length).sum / (historyarm(x).length-s)
-            val mu = historyarm(x).sum / historyarm(x).length
-            glr = glr.max(s*kl_safe(mu1, mu) + (historyarm(x).length-s)*kl_safe(mu2, mu))
+            val mu1 = cumulative_history(x)(s-1)._2 / cumulative_history(x)(s-1)._1
+            val mu2 = cumulative_history(x).last._2 - cumulative_history(x)(s-1)._2 / (cumulative_history(x).last._1-s)
+            val mu = cumulative_history(x).last._2 / cumulative_history(x).last._1
+            glr = glr.max(s*kl_safe(mu1, mu) + (cumulative_history(x).last._1-s)*kl_safe(mu2, mu))
           }
           if(glr > beta) { // reinitialize all data for this arm
             //println(s"Change detected at time $t at arm $x, history of this arm: ${historyarm(x).length}")
             tarms(x) = initializationvalue
             counts(x) = initializationvalue
             sums(x) = initializationvalue
-            historyarm(x) = List[Double]()
+            cumulative_history(x) = Array[(Int, Double)]() //reset entire memory for this arm
             changedetected = true // flag that a change was detected
           }
       }
