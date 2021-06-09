@@ -85,7 +85,7 @@ case class MP_M_UCB(windowsize: Int, nchanges: Int)(val stream: Simulator, val r
     k = scalingstrategy.scale(gains, indexes, sums, counts, t)
 
     (0 until narms).foreach { x =>
-      if(counts(x) > windowsize) {
+      if(cumulative_history(x).length > windowsize) {
         val w1 = cumulative_history(x).last._2 - cumulative_history(x)(cumulative_history(x).length-(windowsize/2)-1)._2
         val w2 = cumulative_history(x)(cumulative_history(x).length-(windowsize/2)-1)._2 - cumulative_history(x)(cumulative_history(x).length-windowsize-1)._2
         //val w1 = historyarm(x).slice(historyarm(x).length-(windowsize/2+1)+1,historyarm(x).length).sum
