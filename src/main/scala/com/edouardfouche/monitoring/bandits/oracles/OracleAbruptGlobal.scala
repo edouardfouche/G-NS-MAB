@@ -20,7 +20,7 @@ import scala.util.Random
 case class OracleAbruptGlobal(stream: Simulator, reward: Reward, scalingstrategy: ScalingStrategy, var k: Int) extends Bandit {
   val name: String = "CustomOracle"
 
-  val n = 100000
+  val n = 10000 // 100000
   val d = 100
 
   val a = (1 to d).map(_/d.toDouble).toArray

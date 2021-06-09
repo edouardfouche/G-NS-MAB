@@ -16,7 +16,13 @@ import com.edouardfouche.streamsimulator.Simulator
   * @param k the initial number of pull per round
   */
 case class MP_ADR_Elimination_UCB(delta: Double)(val stream: Simulator, val reward: Reward, val scalingstrategy: ScalingStrategy, var k: Int) extends BanditUCB with BanditAdwin {
-  val name = s"MP-ADR-Elimination-UCB; d=$delta"
+  val name = s"MP-ADR-Elimination-UCB-ADWIN1; d=$delta"
+
+  //var history: List[scala.collection.mutable.Map[Int,Double]] = List() // first el in the update for count, and last in the update for weight
+  var cumulative_history: scala.collection.mutable.Map[Int,Array[(Int,Double)]] =
+    collection.mutable.Map((0 until narms).map(x => x -> Array[(Int,Double)]()).toMap.toSeq: _*)
+  //  var changedetected: Boolean = false // Just to flag whether there was a change in the iteration or not
+  def epsilon(n:Int,m:Int): Double = math.sqrt(math.log(1.0/delta)/(2.0*n)) + math.sqrt(math.log(1.0/delta)/(2.0*m))
 
   var istar: Array[Int] = (0 until narms).map(x => x).toArray // candidates of the best arms
   var toremove = Array[Int]()
@@ -88,7 +94,9 @@ case class MP_ADR_Elimination_UCB(delta: Double)(val stream: Simulator, val rewa
         sums_e(x._1) += d
       }
       // Add into adwin and add the update into the map
-      sharedAdwin.addElement(x._1, d)
+      //sharedAdwin.addElement(x._1, d)
+      val lastelement: (Int, Double) = if(cumulative_history(x._1).isEmpty) (0,0.0) else cumulative_history(x._1).last
+      cumulative_history(x._1) = cumulative_history(x._1) :+ (lastelement._1 + 1, lastelement._2 + d)
       updates(x._1) = d
       d
     })
@@ -97,26 +105,34 @@ case class MP_ADR_Elimination_UCB(delta: Double)(val stream: Simulator, val rewa
 
     k = scalingstrategy.scale(gains, indexes, sums, counts, t)
 
-    // Here we, add up the size of the adwin (those are the number of pulls) and the number of unpulls, to get the
-    // actual size of window each arm.
-    val windows = (0 until narms).map(x => (x, sharedAdwin.getSingleSize(x) + (history.length-counts(x))))
-    val smallest_window = windows.minBy(_._2) // this is the smallest window
-
-    // Then some ADWIN instance has shrinked and we must reset.
-    if(smallest_window._2.toInt < history.length-1) {
-      //println(s"${name} resetting at time t=$t, smallestw=${smallest_window._2.toInt}, history.length=${history.length}")
-      sharedAdwin = new SharedAdwin(stream.npairs, delta)
-      history = List()
-      (0 until narms).foreach { x => // reinitialize all the arms and the candidates
-        counts(x) = initializationvalue
-        sums(x) = initializationvalue
-        counts_e(x) = initializationvalue
-        sums_e(x) = initializationvalue
-        istar = (0 until narms).map(x => x).toArray
+    // ADWIN1 change detection (Junpei Modified)
+    (0 until narms).foreach { x =>
+      if(cumulative_history(x).length > 10) {
+        if(t % 10 == 0) {
+          val (nt, st): (Int, Double) = cumulative_history(x).last
+          var changedetected = false
+          var i = 1
+          while((!changedetected) && i < (cumulative_history(x).length-2)) {
+            changedetected = false
+            val y: (Int, Double) = cumulative_history(x)(i)
+            if (math.abs((y._2 / y._1.toDouble) - (st - y._2) / (nt.toDouble - y._1.toDouble)) > epsilon(y._1, nt - y._1)) {
+              changedetected = true
+              (0 until narms).foreach {z =>
+                cumulative_history(z) = Array[(Int, Double)]()
+                counts(z) = initializationvalue
+                sums(z) = initializationvalue
+                counts_e(z) = initializationvalue
+                sums_e(z) = initializationvalue
+              } //reset entire memory
+              history = List()
+              istar = (0 until narms).map(x => x).toArray
+            }
+            i += 3 //3 is for speeding up // May not be necessary? (Edouard)
+          }
+        }
       }
     }
     t = history.length + 1 // The time context is the same as the history, which is the same as the smallest window
-
     (arms, gains, gains.sum)
   }
 

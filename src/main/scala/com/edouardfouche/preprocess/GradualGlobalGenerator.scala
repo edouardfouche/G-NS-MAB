@@ -26,7 +26,7 @@ import org.apache.commons.math3.random.MersenneTwister
   */
 case class GradualGlobalGenerator(d: Int = 100) extends Scenario{
   val id = s"GradualGlobalGenerator-$d"
-  val n = 100000
+  val n = 10000 // 100000
   /**
     * generate data
     * @return A 2-D Array of Double containing the values from the csv. (row oriented)

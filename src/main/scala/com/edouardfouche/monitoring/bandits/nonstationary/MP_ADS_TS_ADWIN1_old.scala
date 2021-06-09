@@ -17,13 +17,13 @@ import com.edouardfouche.streamsimulator.Simulator
   * @param scalingstrategy the scaling strategy, which decides how many arms to pull for the next step
   * @param k the initial number of pull per round
   */
-case class MP_ADS_TS_ADWIN1(delta: Double, ADR: Boolean = false)(val stream: Simulator, val reward: Reward, val scalingstrategy: ScalingStrategy, var k: Int) extends BanditTS with BanditAdwin {
-  val name = s"MP-ADS-TS-ADWIN1; d=$delta; r=$ADR"
+case class MP_ADS_TS_ADWIN1_old(delta: Double)(val stream: Simulator, val reward: Reward, val scalingstrategy: ScalingStrategy, var k: Int) extends BanditTS with BanditAdwin {
+  val name = s"MP-ADS-TS-ADWIN1; d=$delta"
 
   //var history: List[scala.collection.mutable.Map[Int,Double]] = List() // first el in the update for count, and last in the update for weight
-  var cumulative_history: scala.collection.mutable.Map[Int,Array[(Int,Double)]] =
-    collection.mutable.Map((0 until narms).map(x => x -> Array[(Int,Double)]()).toMap.toSeq: _*)
-  //  var changedetected: Boolean = false // Just to flag whether there was a change in the iteration or not
+  var cumulative_history: scala.collection.mutable.Map[Int,List[(Int,Double)]] =
+    collection.mutable.Map((0 until narms).map(x => x -> List[(Int,Double)]()).toMap.toSeq: _*)
+  var changedetected: Boolean = false // Just to flag whether there was a change in the iteration or not
   def epsilon(n:Int,m:Int): Double = math.sqrt(math.log(1.0/delta)/(2.0*n)) + math.sqrt(math.log(1.0/delta)/(2.0*m))
 
   def next: (Array[(Int, Int)], Array[Double], Double) = {
@@ -60,43 +60,65 @@ case class MP_ADS_TS_ADWIN1(delta: Double, ADR: Boolean = false)(val stream: Sim
 
     k = scalingstrategy.scale(gains, indexes, sums, counts, t)
 
-    // ADWIN1 change detection (Junpei Modified)
+    // ADWIN1 change detection
     (0 until narms).foreach { x =>
       if(cumulative_history(x).length > 10) {
         if(t % 10 == 0) {
           val (nt, st): (Int, Double) = cumulative_history(x).last
-          var changedetected = false
-          var i = 1
-          while((!changedetected) && i < (cumulative_history(x).length-2)) {
+          changedetected = true
+          while(changedetected && (cumulative_history(x).length > 10)) { // Do this until no change is detected or window is too small
             changedetected = false
-            val y: (Int, Double) = cumulative_history(x)(i)
-            if (math.abs((y._2 / y._1.toDouble) - (st - y._2) / (nt.toDouble - y._1.toDouble)) > epsilon(y._1, nt - y._1)) {
-              changedetected = true
-              if(ADR){ //ADR
-                (0 until narms).foreach {z => cumulative_history(z) = Array[(Int, Double)]()} //reset entire memory
-                history = List()
-                beta_params = (0 until narms).map(x => (1.0,1.0)).toArray
-                sums = (0 until narms).map(_ => initializationvalue).toArray // Initialization the weights to maximal gain forces to exploration at the early phase
-                counts = sums.map(_ => initializationvalue)
-              }else{ //ADS
-                (0 until narms).foreach {z => cumulative_history(z) = cumulative_history(z).drop(i+1)} //remove first i elements
-                val torollback = history.take(i+1)
-                history = history.drop(i+1)
-                for(rollback <- torollback) {
-                  for((key,value) <- rollback) {
-                    sums(key) = sums(key) - value
-                    counts(key) = counts(key) - 1 //- value._2
-                    beta_params(key) = (beta_params(key)._1-value, beta_params(key)._2-(1.0-value))
-                  }
-                }
+            for (y <- cumulative_history(x).init) {
+              if (math.abs((y._2 / y._1.toDouble) - (st - y._2) / (nt.toDouble - y._1.toDouble)) > epsilon(y._1, nt - y._1)) {
+                changedetected = true
               }
             }
-            i += 3 //3 is for speeding up // May not be necessary? (Edouard)
+            if(changedetected) cumulative_history(x) = cumulative_history(x).tail // delete oldest sample
+          }
+        }
+      }
+    }
+
+    // Here we, add up the size of the adwin (those are the number of pulls) and the number of unpulls, to get the
+    // actual size of window each arm.
+    val windows: Array[Int] = (0 until narms).map(x => (cumulative_history(x).length + (history.length-counts(x))).toInt).toArray
+    val smallest_window: Int = windows.min // this is the smallest window
+
+    // Rolling back on the ADWIN knowledge
+    /*
+    for {
+      x <-  (0 until narms)
+    } {
+      if(windows(x) > smallest_window) {
+        for{
+          y <- smallest_window until windows(x)
+        } {
+          cumulative_history(x) = cumulative_history(x).tail
+        }
+      }
+    }
+     */
+
+    // Rolling back on the bandits knowledge
+    if(smallest_window < history.length-1) {
+      for{
+        x <- smallest_window until history.length
+      } {
+        val rollback = history.head
+        history = history.tail
+        for((key,value) <- rollback) {
+          sums(key) = sums(key) - value // if(counts(key) == 1.0) 1.0 else weights(key) - (1.0/(counts(key)-1.0))*(value._1 - weights(key))
+          counts(key) = counts(key) - 1 //- value._2
+          beta_params(key) = (beta_params(key)._1-value, beta_params(key)._2-(1.0-value))
+          // As we backtrack, check whether the play was deleted already, otherwise delete it
+          if((cumulative_history(key).length + (history.length-counts(key))).toInt > history.length) {
+            cumulative_history(key) = cumulative_history(key).tail
           }
         }
       }
     }
     t = history.length + 1 // The time context is the same as the history, which is the same as the smallest window
+
     (arms, gains, gains.sum)
   }
 }

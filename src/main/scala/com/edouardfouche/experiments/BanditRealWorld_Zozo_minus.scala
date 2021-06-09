@@ -96,12 +96,12 @@ object BanditRealWorld_Zozo_minus extends BanditExperiment {
     //Exp3M_ADWIN(0.1)(_,_,_,_),
 
     // Ours
-    MP_ADS_TS(0.1)(_,_,_,_),
-    MP_ADS_TS(0.01)(_,_,_,_),
-    MP_ADS_TS(0.001)(_,_,_,_),
-    MP_ADR_TS(0.1)(_,_,_,_),
-    MP_ADR_TS(0.01)(_,_,_,_),
-    MP_ADR_TS(0.001)(_,_,_,_),
+    MP_ADS_TS_ADWIN1(0.1)(_,_,_,_),
+    MP_ADS_TS_ADWIN1(0.01)(_,_,_,_),
+    MP_ADS_TS_ADWIN1(0.001)(_,_,_,_),
+    MP_ADR_TS_ADWIN1(0.1)(_,_,_,_),
+    MP_ADR_TS_ADWIN1(0.01)(_,_,_,_),
+    MP_ADR_TS_ADWIN1(0.001)(_,_,_,_),
     MP_ADR_Elimination_UCB(0.1)(_,_,_,_),
     MP_ADR_Elimination_UCB(0.01)(_,_,_,_),
     MP_ADR_Elimination_UCB(0.001)(_,_,_,_),
