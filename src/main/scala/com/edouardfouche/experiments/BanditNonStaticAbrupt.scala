@@ -18,7 +18,7 @@ package com.edouardfouche.experiments
 
 import com.edouardfouche.monitoring.bandits.nonstationary._
 import com.edouardfouche.monitoring.bandits.adversarial._
-import com.edouardfouche.monitoring.bandits.oracles.{OracleDynamic, OracleRandom, OracleStatic}
+import com.edouardfouche.monitoring.bandits.oracles.{OracleAbrupt, OracleDynamic, OracleRandom, OracleStatic}
 import com.edouardfouche.monitoring.bandits.stationary._
 import com.edouardfouche.monitoring.scalingstrategies._
 import com.edouardfouche.preprocess._
@@ -34,7 +34,7 @@ object BanditNonStaticAbrupt extends BanditSyntheticExperiment {
 
   val generator= AbruptGenerator(d)
 
-  val nRep = 5
+  val nRep = 100
 
   val scalingstrategies: Array[ScalingStrategy] = Array(
     //NoScaling(10),
@@ -48,6 +48,7 @@ object BanditNonStaticAbrupt extends BanditSyntheticExperiment {
     OracleDynamic,
     OracleStatic,
     OracleRandom,
+    OracleAbrupt,
     //OracleSequential,
     //CUCB, CUCBm,
     //MPKLUCB, MPKLUCBPLUS,
@@ -88,14 +89,20 @@ object BanditNonStaticAbrupt extends BanditSyntheticExperiment {
     //Exp3M_ADWIN(0.1)(_,_,_,_),
 
     // Ours
-    MP_ADS_TS(0.1)(_,_,_,_),
-    MP_ADS_TS(0.01)(_,_,_,_),
-    MP_ADS_TS(0.001)(_,_,_,_),
-    MP_ADR_TS(0.1)(_,_,_,_),
-    MP_ADR_TS(0.01)(_,_,_,_),
-    MP_ADR_TS(0.001)(_,_,_,_),
+    MP_ADS_TS_ADWIN1(0.1)(_,_,_,_),
+    MP_ADS_TS_ADWIN1(0.01)(_,_,_,_),
+    MP_ADS_TS_ADWIN1(0.001)(_,_,_,_),
+    MP_ADS_TS_ADWIN1(0.0001)(_,_,_,_),
+    MP_ADS_TS_ADWIN1(0.00001)(_,_,_,_),
+    MP_ADS_TS_ADWIN1(0.1,ADR=true)(_,_,_,_),
+    MP_ADS_TS_ADWIN1(0.01,ADR=true)(_,_,_,_),
+    MP_ADS_TS_ADWIN1(0.001,ADR=true)(_,_,_,_),
+    MP_ADS_TS_ADWIN1(0.0001,ADR=true)(_,_,_,_),
+    MP_ADS_TS_ADWIN1(0.00001,ADR=true)(_,_,_,_),
     MP_ADR_Elimination_UCB(0.1)(_,_,_,_),
     MP_ADR_Elimination_UCB(0.01)(_,_,_,_),
     MP_ADR_Elimination_UCB(0.001)(_,_,_,_),
+    MP_ADR_Elimination_UCB(0.0001)(_,_,_,_),
+    MP_ADR_Elimination_UCB(0.00001)(_,_,_,_),
   )
 }
