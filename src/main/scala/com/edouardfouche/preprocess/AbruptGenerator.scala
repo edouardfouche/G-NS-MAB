@@ -26,13 +26,13 @@ import org.apache.commons.math3.random.MersenneTwister
   */
 case class AbruptGenerator(d: Int = 100) extends Scenario{
   val id = s"AbruptGenerator-$d" //val J = 90 // few high-reward arms
-  val n = 100000
+  val n = 10000
   /**
     * generate data
     * @return A 2-D Array of Double containing the values from the csv. (row oriented)
     */
   def generate(rand: RandBasis =
-                 new RandBasis(new ThreadLocalRandomGenerator(new MersenneTwister(scala.util.Random.nextInt)))): Array[Array[Double]] = {
+               new RandBasis(new ThreadLocalRandomGenerator(new MersenneTwister(scala.util.Random.nextInt)))): Array[Array[Double]] = {
     //val a = (1 to d).map(_/d.toDouble - 1/(3*d.toDouble)).toArray
     val a = (1 to d).map(_/d.toDouble).toArray
     val means = a.reverse
@@ -42,7 +42,10 @@ case class AbruptGenerator(d: Int = 100) extends Scenario{
       val index = x._2
       val partA: Array[Double] = (0 until n/3).toArray.map(y => if(b.draw()) 1.0 else 0.0)
       val partB: Array[Double] = (0 until n/3).toArray.map{y =>
-        if(x._2 < 30) 0.0
+        if(x._2 < 10){
+          val bhalf = new Bernoulli(0.5)(rand)
+          if( bhalf.draw() ) 1.0 else 0.0
+        }
         else {
           if(b.draw()) 1.0 else 0.0
         }

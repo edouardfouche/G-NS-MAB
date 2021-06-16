@@ -16,7 +16,7 @@ import com.edouardfouche.streamsimulator.Simulator
 case class OracleAbrupt(stream: Simulator, reward: Reward, scalingstrategy: ScalingStrategy, var k: Int) extends Bandit {
   val name: String = "CustomOracle"
 
-  val n = 100000 // 100000
+  val n = 10000 // 100000
   val d = 100
 
   val a = (1 to d).map(_/d.toDouble).toArray
@@ -24,7 +24,7 @@ case class OracleAbrupt(stream: Simulator, reward: Reward, scalingstrategy: Scal
   val cols: Array[Array[Double]] = means.zipWithIndex.map{x =>
     val partA: Array[Double] = (0 until n/3).toArray.map(y => x._1)
     val partB: Array[Double] = (0 until n/3).toArray.map{y =>
-      if(x._2 < 30) 0.0
+      if(x._2 < 10) 0.5
       else {
         x._1
       }
