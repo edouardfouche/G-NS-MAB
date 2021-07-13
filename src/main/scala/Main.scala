@@ -90,6 +90,8 @@ object Main extends LazyLogging {
       BanditRealWorld_Bioliq.run()
       BanditRealWorld_Zozo_minus.run()
     }
+
+    case "BanditRealWorld_Zozo_unif" => BanditRealWorld_Zozo_unif.run()
     case "BanditRealWorld_Zozo_minus" => BanditRealWorld_Zozo_minus.run()
     case "BanditRealWorld_Zozo" => BanditRealWorld_Zozo.run()
     case "BanditRealWorld_Bioliq" => BanditRealWorld_Bioliq.run()

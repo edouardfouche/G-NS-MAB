@@ -33,6 +33,7 @@ object Data {
   lazy val bioliq_1wx20_MI_1000_100 = ExternalDataRef("bioliq_1wx20_MI_1000_100", currentdir + "/data/Bioliq_S-MAB_1wx20_MI_1000_100.csv", 0, ",", excludeIndex = false, "cache")
   lazy val zozo_bts_all = ExternalDataRef("zozo_bts_all", currentdir + "/data/zozo_bts_all.csv", 0, ",", excludeIndex = false, "cache")
   lazy val zozo_bts_all_minus = ExternalDataRef("zozo_bts_all_minus", currentdir + "/data/zozo_bts_all_minus.csv", 0, ",", excludeIndex = false, "cache")
+  lazy val zozo_random_all_minus_small = ExternalDataRef("zozo_random_all_minus_small", currentdir + "/data/zozo_random_all_minus_small.csv", 0, ",", excludeIndex = false, "cache")
 
   lazy val bioliq_1wx10_1000 = ExternalDataRefResample("bioliq_1wx10_1000", currentdir + "/data/Bioliq_S-MAB_1wx20_MI_1000_100.csv", 0, ",", "cache", 10, 1000)
   lazy val bioliq_1wx20_1000 = ExternalDataRefResample("bioliq_1wx20_1000", currentdir + "/data/Bioliq_S-MAB_1wx20_MI_1000_100.csv", 0, ",", "cache", 20, 1000)
