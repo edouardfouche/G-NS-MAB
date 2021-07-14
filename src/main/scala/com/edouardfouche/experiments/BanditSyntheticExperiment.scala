@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 Edouard Fouché
+ * Copyright (C) 2021 Edouard Fouché
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -49,21 +49,12 @@ trait BanditSyntheticExperiment extends BanditExperiment {
   val banditConstructors = Vector(
     CUCB, CUCBm,
     MPKLUCB, MPKLUCBPLUS,
-    //Exp3M(0.1)(_, _, _, _), Exp3M(0.3)(_, _, _, _), Exp3M(0.5)(_, _, _, _), Exp3M(0.7)(_, _, _, _), Exp3M.apply(0.9)(_, _, _, _),
-    //,//, Exp3M(0.1)(_, _, _, _),
     MPTS, IMPTS, MPOTS,
     Exp3M,
-    //MP_D_TS(0.9)(_,_,_,_),
-    // IMPTS, MPOTS,
-    //MP_E_Greedy(0.9)(_, _, _, _),
-    //MP_E_Greedy(1)(_, _, _, _), MP_E_Greedy(0.9)(_, _, _, _)//, MP_E_Greedy(0.95)(_, _, _, _), MP_E_Greedy(0.9)(_, _, _, _), MP_E_Greedy(0.8)(_, _, _, _), MP_E_Greedy(0.7)(_, _, _, _)
     MP_ADS_UCB(0.1)(_,_,_,_),
     MP_ADS_KL_UCB(0.1)(_,_,_,_),
     MP_ADS_TS(0.1)(_,_,_,_),
     Exp3M_ADWIN(0.1)(_,_,_,_)
-    //MP_ADS_TS(1)(_,_,_,_),
-    //MP_ADS_TS(0.01)(_,_,_,_),
-    //MP_ADS_TS(0.001)(_,_,_,_)
   )
 
   def run(): Unit = {
@@ -111,17 +102,11 @@ trait BanditSyntheticExperiment extends BanditExperiment {
           step <- 0 until allgains.length
         }{
           val summary = ExperimentSummary(attributes)
-          // this is the list of all the data possible we can record, "attributes" is usually a subset of it
-          // val attributes = List("bandit","dataset","action","reward","scaling","windowSize","stepSize",
-          // "delta","gamma","k","banditk","narms","gain","matrixdiff","cpuTime","wallTime","iteration","nrep")
           summary.add("bandit", bandit.name)
           summary.add("dataset", bandit.stream.dataset.id)
           summary.add("scalingstrategy", bandit.scalingstrategy.name)
           summary.add("k",  "%.2f".format(allks(step)))
           summary.add("gain",  "%.2f".format(allgains(step)))
-          //summary.add("confidence", allconfs(step))
-          //summary.add("gamma", bandit.scalingstrategy.gamma)
-          //summary.add("delta", bandit.scalingstrategy.delta)
           summary.add("cputime", "%.4f".format(allcpu(step)))
           summary.add("iteration", step)
           summary.write(summaryPath)

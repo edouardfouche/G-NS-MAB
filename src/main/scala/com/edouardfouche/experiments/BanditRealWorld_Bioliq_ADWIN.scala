@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 Edouard Fouché
+ * Copyright (C) 2021 Edouard Fouché
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -104,16 +104,11 @@ object BanditRealWorld_Bioliq_ADWIN extends BanditExperiment {
           step <- 0 until allgains.length
         }{
           val summary = ExperimentSummary(attributes)
-          // this is the list of all the data possible we can record, "attributes" is usually a subset of it
-          // val attributes = List("bandit","dataset","action","reward","scaling","windowSize","stepSize",
-          // "delta","gamma","k","banditk","narms","gain","matrixdiff","cpuTime","wallTime","iteration","nrep")
           summary.add("bandit", bandit.name)
           summary.add("dataset", bandit.stream.dataset.id)
           summary.add("scalingstrategy", bandit.scalingstrategy.name)
           summary.add("k",  "%.2f".format(allks(step)))
           summary.add("gain",  "%.2f".format(allgains(step)))
-          //summary.add("confidence", allconfs(step))
-          //summary.add("gamma", bandit.scalingstrategy.gamma)
           summary.add("cputime", "%.4f".format(allcpu(step)))
           summary.add("historylength", "%.4f".format(allhistorylengths(step)))
           summary.add("iteration", step)

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 Edouard Fouché
+ * Copyright (C) 2021 Edouard Fouché
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -49,13 +49,9 @@ object BanditNonStaticAbrupt extends BanditSyntheticExperiment {
     OracleStatic,
     OracleRandom,
     OracleAbrupt,
-    //OracleSequential,
-    //CUCB, CUCBm,
-    //MPKLUCB, MPKLUCBPLUS,
-    //Exp3M,
 
     // Static
-    MPTS, MPKLUCB,//, IMPTS, MPOTS,
+    MPTS, MPKLUCB,
     MP_E_Greedy(0.7)(_, _, _, _), MP_E_Greedy(0.8)(_, _, _, _),
     MP_E_Greedy(0.9)(_, _, _, _), MP_E_Greedy(0.99)(_, _, _, _),
 
@@ -80,13 +76,6 @@ object BanditNonStaticAbrupt extends BanditSyntheticExperiment {
     MP_GLR_KL_UCB_L_F(_,_,_,_),
     MP_M_UCB(1000, 10)(_,_,_,_), MP_M_UCB(5000, 10)(_,_,_,_),
     MP_M_UCB(1000, 100)(_,_,_,_), MP_M_UCB(5000, 100)(_,_,_,_),
-
-    //OracleStatic_ADWIN(0.1)(_,_,_,_), OracleDynamic_ADWIN(0.1)(_,_,_,_), OracleRandom_ADWIN(0.1)(_,_,_,_),
-    //OracleSequential_ADWIN(0.1)(_,_,_,_),
-
-    //MP_ADS_UCB(0.1)(_,_,_,_),
-    //MP_ADS_KL_UCB(0.1)(_,_,_,_),
-    //Exp3M_ADWIN(0.1)(_,_,_,_),
 
     // Ours
     MP_ADS_TS_ADWIN1(0.1)(_,_,_,_),
