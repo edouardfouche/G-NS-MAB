@@ -1,11 +1,27 @@
+/*
+ * Copyright (C) 2021 Edouard Fouché
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 package com.edouardfouche.monitoring.bandits.adversarial
 
 import com.edouardfouche.monitoring.bandits.Bandit
 import com.edouardfouche.monitoring.rewards.Reward
 import com.edouardfouche.monitoring.scalingstrategies.ScalingStrategy
 import com.edouardfouche.streamsimulator.Simulator
-import scala.language.implicitConversions
 
+import scala.language.implicitConversions
 import scala.util.Random
 
 /**
@@ -21,7 +37,7 @@ case class Exp3M(stream: Simulator, reward: Reward, scalingstrategy: ScalingStra
   val name: String = s"Exp3.M"
 
   // As the weights of Exp3M can grow very large, it needs it own weight array made of BigDecimal
-  // Otherwise, at somepoint the weights become Infinity for large experiments
+  // Otherwise, at some point the weights become Infinity for large experiments
   var Exp3Mweights: Array[BigDecimal] = (0 until narms).map(x => BigDecimal(1.0)).toArray // initialize weights to 1
   var nperformed: Int = 0
   var gamma = (0.999).min(

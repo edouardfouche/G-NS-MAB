@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 Edouard Fouché
+ * Copyright (C) 2021 Edouard Fouché
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -48,7 +48,6 @@ case class ExternalDataRefResample(id: String, path: String, header: Int, separa
           data.take(n) // take the first dims
         }
       }
-
 
       if(dataN(0).length == nDim) dataN
       else{

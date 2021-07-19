@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 Edouard Fouché
+ * Copyright (C) 2021 Edouard Fouché
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -22,6 +22,8 @@ import org.apache.commons.math3.random.MersenneTwister
 /**
   * GradualGenerator simulates a setting where the means of the tops arms at "gradually" (i.e., successively) set to 0
   * and back. (as in "Scaling Mutli-Armed Bandit Algorithms" (Fouché 2019)).
+  * Changes all the arms at once (it is global)
+  *
   * @param d number of arms
   */
 case class GradualGlobalGenerator(d: Int = 100) extends Scenario{
@@ -33,7 +35,6 @@ case class GradualGlobalGenerator(d: Int = 100) extends Scenario{
     */
   def generate(rand: RandBasis =
                  new RandBasis(new ThreadLocalRandomGenerator(new MersenneTwister(scala.util.Random.nextInt)))): Array[Array[Double]] = {
-    //val a = (1 to d).map(_/d.toDouble - 1/(3*d.toDouble)).toArray
     val a = (1 to d).map(_/d.toDouble).toArray
     val means = a.reverse
 

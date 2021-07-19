@@ -1,3 +1,19 @@
+/*
+ * Copyright (C) 2021 Edouard Fouché
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 package com.edouardfouche.monitoring.bandits.nonstationary
 
 import breeze.stats.distributions.Gaussian
@@ -7,15 +23,14 @@ import com.edouardfouche.monitoring.scalingstrategies.ScalingStrategy
 import com.edouardfouche.streamsimulator.Simulator
 
 /**
-  * M-UCB
+  * M-UCB, as in "Nearly optimal adaptive procedurewith change detection for piecewise-stationary bandit" (Cao et al., 2019)
   *
-  * @param windowsize size of the sliding window (must be even)
-  * @param nchanges Number of changes (M in the paper)
-  * @param stream a stream simulator on which we let this bandit run
-  * @param reward the reward function which derives the gains for each action
+  * @param windowsize      size of the sliding window (must be even)
+  * @param nchanges        Number of changes (M in the paper)
+  * @param stream          a stream simulator on which we let this bandit run
+  * @param reward          the reward function which derives the gains for each action
   * @param scalingstrategy the scaling strategy, which decides how many arms to pull for the next step
-  * @param k the initial number of pull per round
-  *
+  * @param k               the initial number of pull per round
   */
 case class MP_M_UCB(windowsize: Int, nchanges: Int)(val stream: Simulator, val reward: Reward, val scalingstrategy: ScalingStrategy, var k: Int) extends BanditUCB {
   require(windowsize > 1)
@@ -25,11 +40,11 @@ case class MP_M_UCB(windowsize: Int, nchanges: Int)(val stream: Simulator, val r
   override val logfactor = 2
   val name = s"MP-M-UCB; w=$windowsize; m=$nchanges"
 
-  //var historyarm: Array[List[Double]] = (0 until narms).map(_ => List[Double]()).toArray
   var cumulative_history: scala.collection.mutable.Map[Int,Array[(Int,Double)]] =
     collection.mutable.Map((0 until narms).map(x => x -> Array[(Int,Double)]()).toMap.toSeq: _*)
 
   val horizon: Int = stream.nbatches
+  // Parameter tuning as in the paper
   val b = math.sqrt((windowsize/2)*math.log(2*narms*math.pow(horizon,2)))
   val gamma = if(nchanges == 0) 1/horizon else math.sqrt((nchanges-1)*narms*(2*b+3*math.sqrt(windowsize))/(2*horizon)).max(1/horizon).min(1)
   var tau = t
@@ -37,7 +52,6 @@ case class MP_M_UCB(windowsize: Int, nchanges: Int)(val stream: Simulator, val r
 
   override def reset: Unit = {
     super.reset
-    //historyarm = (0 until narms).map(_ => List[Double]()).toArray
     var cumulative_history: scala.collection.mutable.Map[Int,Array[(Int,Double)]] =
       collection.mutable.Map((0 until narms).map(x => x -> Array[(Int,Double)]()).toMap.toSeq: _*)
   }
@@ -75,7 +89,6 @@ case class MP_M_UCB(windowsize: Int, nchanges: Int)(val stream: Simulator, val r
       currentMatrix(x._1) = x._2 // replace
       counts(x._1) += 1.0
       sums(x._1) += d
-      //historyarm(x._1) = historyarm(x._1) :+ d // Keep history of rewards for each arm
       val lastelement: (Int, Double) = if(cumulative_history(x._1).isEmpty) (0,0.0) else cumulative_history(x._1).last
       cumulative_history(x._1) = cumulative_history(x._1) :+ (lastelement._1 + 1, lastelement._2 + d)
       d
@@ -88,8 +101,6 @@ case class MP_M_UCB(windowsize: Int, nchanges: Int)(val stream: Simulator, val r
       if(cumulative_history(x).length > windowsize) {
         val w1 = cumulative_history(x).last._2 - cumulative_history(x)(cumulative_history(x).length-(windowsize/2)-1)._2
         val w2 = cumulative_history(x)(cumulative_history(x).length-(windowsize/2)-1)._2 - cumulative_history(x)(cumulative_history(x).length-windowsize-1)._2
-        //val w1 = historyarm(x).slice(historyarm(x).length-(windowsize/2+1)+1,historyarm(x).length).sum
-        //val w2 = historyarm(x).slice(historyarm(x).length-windowsize,historyarm(x).length-(windowsize/2+1)+1).sum
         if(math.abs(w1-w2) > b) { // Detect a change
           changedetected = true
           //println(s"Change detected at time $t on arm $x")
@@ -97,14 +108,13 @@ case class MP_M_UCB(windowsize: Int, nchanges: Int)(val stream: Simulator, val r
       }
     }
 
-    // Definitelety global changes
+    // Global changes
     if(changedetected) { // there was at least one change!
       tau = t
       changedetected = false // reset the change detected flag
       (0 until narms).foreach { x => // reinitialize all the arms
         counts(x) = initializationvalue
         sums(x) = initializationvalue
-        //historyarm(x) = List[Double]()
         cumulative_history(x) = Array[(Int, Double)]() //reset entire memory for this arm
       }
     }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 Edouard Fouché
+ * Copyright (C) 2021 Edouard Fouché
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -15,15 +15,6 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 package com.edouardfouche.preprocess
-
-import java.io.FileInputStream
-import java.util.zip.{ZipFile, ZipInputStream}
-
-import scala.collection.parallel.ForkJoinTaskSupport
-
-/**
-  * Created by fouchee on 02.05.17.
-  */
 
 /**
   * Encapsulate a few preprocessing steps (open a CSV file, compute the rank com.edouardfouche.index structure).

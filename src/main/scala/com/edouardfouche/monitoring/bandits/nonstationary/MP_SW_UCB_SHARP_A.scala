@@ -1,3 +1,19 @@
+/*
+ * Copyright (C) 2021 Edouard Fouché
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 package com.edouardfouche.monitoring.bandits.nonstationary
 
 import breeze.stats.distributions.Gaussian
@@ -6,20 +22,18 @@ import com.edouardfouche.monitoring.rewards.Reward
 import com.edouardfouche.monitoring.scalingstrategies.ScalingStrategy
 import com.edouardfouche.streamsimulator.Simulator
 
-import scala.collection.mutable.ArrayBuffer
-
 /**
-  * Sliding-Window UCB # (SW-UCB#) with Multiple Plays -- For abrupt environment
-  * The idea of SW-UCB comes from
+  * Sliding-Window UCB# (SW-UCB#) with Multiple Plays -- For abrupt environment
+  * As in "On  abruptly-changing and  slowly-varying  multiarmed bandit problems" (Wei and Srivastava, 2018)
   *
-  * @param nu a value in [0,1) that quantifies how much the stream changes in abrupt environment
-  * @param lambda a real value that quantifies how much the stream changes
-  * @param stream a stream simulator on which we let this bandit run
-  * @param reward the reward function which derives the gains for each action
+  * @param nu              a value in [0,1) that quantifies how much the stream changes in abrupt environment
+  * @param lambda          a real value that quantifies how much the stream changes
+  * @param stream          a stream simulator on which we let this bandit run
+  * @param reward          the reward function which derives the gains for each action
   * @param scalingstrategy the scaling strategy, which decides how many arms to pull for the next step
-  * @param k the initial number of pull per round
+  * @param k               the initial number of pull per round
   *
-  * The authors selected lambda = 12.3 and lambda = 4.3 for abruptly-changing and slowly-varying environments, respectively
+  *                        The authors selected lambda = 12.3 and lambda = 4.3 for abruptly-changing and slowly-varying environments, respectively
   */
 case class MP_SW_UCB_SHARP_A(nu: Double, lambda: Double)(val stream: Simulator, val reward: Reward, val scalingstrategy: ScalingStrategy, var k: Int) extends BanditUCB {
   val alpha: Double = (1.0-nu)/2.0

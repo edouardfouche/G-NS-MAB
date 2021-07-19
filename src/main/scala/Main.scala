@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 Edouard Fouché
+ * Copyright (C) 2021 Edouard Fouché
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -18,9 +18,6 @@ import com.edouardfouche.experiments._
 import com.edouardfouche.utils.StopWatch
 import com.typesafe.scalalogging.LazyLogging
 
-/**
-  * Created by fouchee on 01.06.17.
-  */
 object Main extends LazyLogging {
   def main(args: Array[String]): Unit = {
     val unit = "ms"
@@ -84,7 +81,6 @@ object Main extends LazyLogging {
       BanditNonStaticAbrupt.run()
       BanditNonStaticGradual.run()
       BanditStatic.run()
-      //BanditNonStaticGlobal.run()
     }
     case "BanditRealWorld" => {
       BanditRealWorld_Bioliq.run()
@@ -93,12 +89,9 @@ object Main extends LazyLogging {
 
     case "BanditRealWorld_Zozo_unif" => BanditRealWorld_Zozo_unif.run()
     case "BanditRealWorld_Zozo_minus" => BanditRealWorld_Zozo_minus.run()
-    case "BanditRealWorld_Zozo" => BanditRealWorld_Zozo.run()
     case "BanditRealWorld_Bioliq" => BanditRealWorld_Bioliq.run()
-    case "BanditRealWorld_Bioliq_test" => BanditRealWorld_Bioliq_test.run()
     case "BanditRealWorld_Bioliq_ADWIN" => BanditRealWorld_Bioliq_ADWIN.run()
     case _ => throw new Error(s"Unknown experiment $arg")
   }
-
   def warn(s: String): Unit = logger.warn(s)
 }

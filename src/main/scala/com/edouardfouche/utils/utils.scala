@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 Edouard Fouché
+ * Copyright (C) 2021 Edouard Fouché
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -16,8 +16,9 @@
  */
 package com.edouardfouche
 
-import java.io.{BufferedWriter, File, FileWriter}
 import com.typesafe.scalalogging.LazyLogging
+
+import java.io.{BufferedWriter, File, FileWriter}
 
 /**
   * Created by fouchee on 11.07.17.

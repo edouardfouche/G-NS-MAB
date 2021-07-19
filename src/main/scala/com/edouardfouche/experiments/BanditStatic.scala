@@ -17,7 +17,7 @@
 package com.edouardfouche.experiments
 
 import com.edouardfouche.monitoring.bandits.adversarial._
-import com.edouardfouche.monitoring.bandits.nonstationary.{MP_ADR_Elimination_UCB, MP_ADR_TS, MP_ADS_TS, MP_ADS_TS_ADWIN1, MP_D_TS, MP_D_UCB, MP_E_Greedy, MP_GLR_KL_UCB_G, MP_GLR_KL_UCB_G_F, MP_GLR_KL_UCB_L, MP_GLR_KL_UCB_L_F, MP_M_UCB, MP_SW_TS, MP_SW_UCB, MP_SW_UCB_SHARP_A, MP_SW_UCB_SHARP_G}
+import com.edouardfouche.monitoring.bandits.nonstationary._
 import com.edouardfouche.monitoring.bandits.oracles.{OracleDynamic, OracleRandom, OracleStatic}
 import com.edouardfouche.monitoring.bandits.stationary._
 import com.edouardfouche.monitoring.scalingstrategies._
@@ -70,8 +70,6 @@ object BanditStatic extends BanditSyntheticExperiment {
     // Active
     MP_GLR_KL_UCB_G(_,_,_,_),
     MP_GLR_KL_UCB_L(_,_,_,_),
-    MP_GLR_KL_UCB_G_F(_,_,_,_),
-    MP_GLR_KL_UCB_L_F(_,_,_,_),
     MP_M_UCB(1000, 10)(_,_,_,_), MP_M_UCB(5000, 10)(_,_,_,_),
     MP_M_UCB(1000, 100)(_,_,_,_), MP_M_UCB(5000, 100)(_,_,_,_),
 

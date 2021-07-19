@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 Edouard Fouché
+ * Copyright (C) 2021 Edouard Fouché
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -22,9 +22,12 @@ import org.apache.commons.math3.random.MersenneTwister
 import scala.annotation.tailrec
 
 /**
-  * ShutdownGenerator simulates a setting where the means of the tops arms at "abruptly" (i.e., at the same time) set to 0 and back
-  * As in "Scaling Multi-Armed Bandit Algorithms" (Fouché 2019)
-  * @param d the number of arms
+  * Simulates a setting where the means of the tops arms at "abruptly" (i.e., at the same time) set to 0 and back
+  * Changes all the arms at once (it is global)
+  * Can do multiple changes
+  *
+  * @param nchanges the number of changes
+  * @param d        the number of arms
   */
 case class AbruptChangesGlobalGenerator(nchanges: Int = 2, d: Int = 100) extends Scenario{
   val id = s"AbruptChangesGlobalGenerator-$nchanges-$d" //val J = 90 // few high-reward arms
@@ -36,7 +39,6 @@ case class AbruptChangesGlobalGenerator(nchanges: Int = 2, d: Int = 100) extends
     */
   def generate(rand: RandBasis =
                              new RandBasis(new ThreadLocalRandomGenerator(new MersenneTwister(scala.util.Random.nextInt)))): Array[Array[Double]] = {
-    //val a = (1 to d).map(_/d.toDouble - 1/(3*d.toDouble)).toArray
     val a = (1 to d).map(_/d.toDouble).toArray
     val means = a.reverse
 

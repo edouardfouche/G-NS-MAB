@@ -18,8 +18,7 @@ package com.edouardfouche.experiments
 
 import breeze.linalg
 import breeze.stats.distributions.{RandBasis, ThreadLocalRandomGenerator}
-import com.edouardfouche.monitoring.bandits.adversarial._
-import com.edouardfouche.monitoring.bandits.nonstationary.{MP_ADS_UCB, MP_ADS_KL_UCB, MP_ADS_TS}
+import com.edouardfouche.monitoring.bandits.adversarial.Exp3M
 import com.edouardfouche.monitoring.bandits.stationary._
 import com.edouardfouche.monitoring.rewards.AbsoluteThreshold
 import com.edouardfouche.monitoring.scalingstrategies._
@@ -47,14 +46,10 @@ trait BanditSyntheticExperiment extends BanditExperiment {
   val nRep: Int
 
   val banditConstructors = Vector(
-    CUCB, CUCBm,
+    CUCB,
     MPKLUCB, MPKLUCBPLUS,
-    MPTS, IMPTS, MPOTS,
+    MPTS, MPOTS,
     Exp3M,
-    MP_ADS_UCB(0.1)(_,_,_,_),
-    MP_ADS_KL_UCB(0.1)(_,_,_,_),
-    MP_ADS_TS(0.1)(_,_,_,_),
-    Exp3M_ADWIN(0.1)(_,_,_,_)
   )
 
   def run(): Unit = {

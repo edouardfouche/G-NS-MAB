@@ -1,3 +1,19 @@
+/*
+ * Copyright (C) 2021 Edouard Fouché
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 package com.edouardfouche.monitoring.bandits.nonstationary
 
 import breeze.stats.distributions.Gaussian
@@ -8,7 +24,7 @@ import com.edouardfouche.streamsimulator.Simulator
 
 /**
   * Sliding-Window UCB # (SW-UCB#) with Multiple Plays -- For gradual environment
-  * The idea of SW-UCB comes from
+  * As in "On  abruptly-changing and  slowly-varying  multiarmed bandit problems" (Wei and Srivastava, 2018)
   *
   * @param windowsize size of the sliding window
   * @param kappa a value  in [0,1) that quantifies how much the stream changes in gradual environment
@@ -70,7 +86,6 @@ case class MP_SW_UCB_SHARP_G(kappa: Double, lambda: Double)(val stream: Simulato
     val gains = (indexes zip newValues).map(x => {
       val d = reward.getReward(x._2, currentMatrix(x._1))
       currentMatrix(x._1) = x._2 // replace
-
       counts(x._1) += 1.0
       sums(x._1) += d
       updates(x._1) = d
@@ -89,8 +104,8 @@ case class MP_SW_UCB_SHARP_G(kappa: Double, lambda: Double)(val stream: Simulato
         val rollback = history.head
         history = history.tail
         for((key,value) <- rollback) {
-          sums(key) = sums(key) - value // if(counts(key) == 1.0) 1.0 else weights(key) - (1.0/(counts(key)-1.0))*(value._1 - weights(key))
-          counts(key) = counts(key) - 1 //- value._2
+          sums(key) = sums(key) - value
+          counts(key) = counts(key) - 1
         }
       }
     }

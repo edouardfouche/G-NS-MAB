@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 Edouard Fouché
+ * Copyright (C) 2021 Edouard Fouché
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -16,7 +16,6 @@
  */
 package com.edouardfouche.monitoring.scalingstrategies
 
-//
 /**
   * Scaling Strategy based on KL-UCB++
   * @param lmin the minimum number of pulls (in fact, typically 1)

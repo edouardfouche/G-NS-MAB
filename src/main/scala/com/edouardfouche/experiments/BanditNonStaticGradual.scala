@@ -70,18 +70,10 @@ object BanditNonStaticGradual extends BanditSyntheticExperiment {
     // Active
     MP_GLR_KL_UCB_G(_,_,_,_),
     MP_GLR_KL_UCB_L(_,_,_,_),
-    MP_GLR_KL_UCB_G_F(_,_,_,_),
-    MP_GLR_KL_UCB_L_F(_,_,_,_),
     MP_M_UCB(1000, 10)(_,_,_,_), MP_M_UCB(5000, 10)(_,_,_,_),
     MP_M_UCB(1000, 100)(_,_,_,_), MP_M_UCB(5000, 100)(_,_,_,_),
 
     // Ours
-    MP_ADS_TS(0.1)(_,_,_,_),
-    MP_ADS_TS(0.01)(_,_,_,_),
-    MP_ADS_TS(0.001)(_,_,_,_),
-    MP_ADR_TS(0.1)(_,_,_,_),
-    MP_ADR_TS(0.01)(_,_,_,_),
-    MP_ADR_TS(0.001)(_,_,_,_),
     MP_ADR_Elimination_UCB(0.1)(_,_,_,_),
     MP_ADR_Elimination_UCB(0.01)(_,_,_,_),
     MP_ADR_Elimination_UCB(0.001)(_,_,_,_),

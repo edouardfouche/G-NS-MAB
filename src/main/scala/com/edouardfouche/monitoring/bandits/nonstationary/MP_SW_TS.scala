@@ -1,3 +1,19 @@
+/*
+ * Copyright (C) 2021 Edouard Fouché
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 package com.edouardfouche.monitoring.bandits.nonstationary
 
 import breeze.stats.distributions.Beta
@@ -7,15 +23,14 @@ import com.edouardfouche.monitoring.scalingstrategies.ScalingStrategy
 import com.edouardfouche.streamsimulator.Simulator
 
 /**
-  * Sliding-Window TS with Multiple Plays
-  * As in Trovò, F., Restelli, M., and Gatti, N. (2020). Sliding-window thompson sampling for non-stationary settings
-  * But possibly with multiple-plays
+  * Sliding-Window TS with Multiple Plays, as in "Sliding-window thompson sampling for non-stationary settings" (Trovò et al, 2020)
+  * Extended to multiple plays
   *
-  * @param windowsize size of the sliding window
-  * @param stream a stream simulator on which we let this bandit run
-  * @param reward the reward function which derives the gains for each action
+  * @param windowsize      size of the sliding window
+  * @param stream          a stream simulator on which we let this bandit run
+  * @param reward          the reward function which derives the gains for each action
   * @param scalingstrategy the scaling strategy, which decides how many arms to pull for the next step
-  * @param k the initial number of pull per round
+  * @param k               the initial number of pull per round
   *
   */
 case class MP_SW_TS(windowsize: Int)(val stream: Simulator, val reward: Reward, val scalingstrategy: ScalingStrategy, var k: Int) extends BanditTS {
@@ -54,7 +69,6 @@ case class MP_SW_TS(windowsize: Int)(val stream: Simulator, val reward: Reward, 
       counts.indices.foreach { x =>
         counts(x) -= countsbuffer(x)(bufferposition)
         sums(x) -= sumsbuffer(x)(bufferposition)
-        //beta_params(x) = ((beta_params(x)._1 - sumsbuffer(x)(bufferposition)).max(0.001), (beta_params(x)._2-(1.0-sumsbuffer(x)(bufferposition))).max(0.001))
         beta_params(x) = ((1.0+sums(x)).max(0.001), (1.0+counts(x)-sums(x)).max(0.001))
       }
     }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 Edouard Fouché
+ * Copyright (C) 2021 Edouard Fouché
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -19,8 +19,6 @@ package com.edouardfouche.preprocess
 import breeze.stats.distributions.{Bernoulli, RandBasis, ThreadLocalRandomGenerator}
 import org.apache.commons.math3.random.MersenneTwister
 
-// StaticGenerator simulates a setting where the means of the arms linearly distributed between 0 and 1
-// (as in the original publication). d is the number of arms.
 /**
   * StaticGenerator simulates a setting where the means of the arms linearly distributed between 0 and 1
   * As in "Scaling Multi-Armed Bandit Algorithms" (Fouché 2019)
@@ -35,7 +33,6 @@ case class StaticGenerator(d: Int = 100) extends Scenario{
     */
   def generate(rand: RandBasis =
                  new RandBasis(new ThreadLocalRandomGenerator(new MersenneTwister(scala.util.Random.nextInt)))): Array[Array[Double]] = {
-    //val a = (1 to d).map(_/d.toDouble - 1/(3*d.toDouble)).toArray
     val a = (1 to d).map(_/d.toDouble).toArray
     val means = a
 

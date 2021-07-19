@@ -18,10 +18,7 @@ package com.edouardfouche.experiments
 
 import breeze.linalg
 import com.edouardfouche.experiments.Data._
-import com.edouardfouche.monitoring.bandits.adversarial._
 import com.edouardfouche.monitoring.bandits.nonstationary._
-import com.edouardfouche.monitoring.bandits.oracles._
-import com.edouardfouche.monitoring.bandits.stationary._
 import com.edouardfouche.monitoring.rewards.AbsoluteThreshold
 import com.edouardfouche.monitoring.scalingstrategies.{NoScaling, ScalingStrategy}
 import com.edouardfouche.preprocess.DataRef
@@ -54,15 +51,15 @@ object BanditRealWorld_Bioliq_ADWIN extends BanditExperiment {
 
   val banditConstructors = Vector(
     // Ours
-    MP_ADS_TS(0.1)(_,_,_,_),
-    MP_ADS_TS(0.01)(_,_,_,_),
-    MP_ADS_TS(0.001)(_,_,_,_),
-    MP_ADR_TS(0.1)(_,_,_,_),
-    MP_ADR_TS(0.01)(_,_,_,_),
-    MP_ADR_TS(0.001)(_,_,_,_),
-    MP_ADR_Elimination_UCB(0.1)(_,_,_,_),
-    MP_ADR_Elimination_UCB(0.01)(_,_,_,_),
-    MP_ADR_Elimination_UCB(0.001)(_,_,_,_),
+    MP_ADS_TS_ADWIN1(0.1)(_, _, _, _),
+    MP_ADS_TS_ADWIN1(0.01)(_, _, _, _),
+    MP_ADS_TS_ADWIN1(0.001)(_, _, _, _),
+    MP_ADS_TS_ADWIN1(0.1, ADR = true)(_, _, _, _),
+    MP_ADS_TS_ADWIN1(0.01, ADR = true)(_, _, _, _),
+    MP_ADS_TS_ADWIN1(0.001, ADR = true)(_, _, _, _),
+    MP_ADR_Elimination_UCB(0.1)(_, _, _, _),
+    MP_ADR_Elimination_UCB(0.01)(_, _, _, _),
+    MP_ADR_Elimination_UCB(0.001)(_, _, _, _),
   )
 
   def run(): Unit = {

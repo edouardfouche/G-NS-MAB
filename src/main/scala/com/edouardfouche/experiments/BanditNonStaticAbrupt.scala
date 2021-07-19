@@ -16,8 +16,8 @@
  */
 package com.edouardfouche.experiments
 
-import com.edouardfouche.monitoring.bandits.nonstationary._
 import com.edouardfouche.monitoring.bandits.adversarial._
+import com.edouardfouche.monitoring.bandits.nonstationary._
 import com.edouardfouche.monitoring.bandits.oracles.{OracleAbrupt, OracleDynamic, OracleRandom, OracleStatic}
 import com.edouardfouche.monitoring.bandits.stationary._
 import com.edouardfouche.monitoring.scalingstrategies._
@@ -72,8 +72,6 @@ object BanditNonStaticAbrupt extends BanditSyntheticExperiment {
     // Active
     MP_GLR_KL_UCB_G(_,_,_,_),
     MP_GLR_KL_UCB_L(_,_,_,_),
-    MP_GLR_KL_UCB_G_F(_,_,_,_),
-    MP_GLR_KL_UCB_L_F(_,_,_,_),
     MP_M_UCB(1000, 10)(_,_,_,_), MP_M_UCB(5000, 10)(_,_,_,_),
     MP_M_UCB(1000, 100)(_,_,_,_), MP_M_UCB(5000, 100)(_,_,_,_),
 

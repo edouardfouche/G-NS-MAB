@@ -1,3 +1,19 @@
+/*
+ * Copyright (C) 2021 Edouard Fouché
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 package com.edouardfouche.monitoring.bandits.stationary
 
 import com.edouardfouche.monitoring.bandits.BanditKLUCB
@@ -22,6 +38,7 @@ import com.edouardfouche.streamsimulator.Simulator
 case class MPKLUCBPLUS(stream: Simulator, reward: Reward, scalingstrategy: ScalingStrategy, var k: Int) extends BanditKLUCB {
   val name = "MP-KLUCBPLUS"
 
+  // KLUCBPLUS is a slight modification of the upper bound in KLUCB
   override def getKLUCBupper(arm: Int, t: Double): Double = {
     val logndn = scala.math.log(t/ counts(arm)) / counts(arm) // alternative: KL-UCB+ scala.math.log(t/ counts(arm)) / counts(arm)
     val p: Double = (sums(arm)/counts(arm)).max(Ndelta)

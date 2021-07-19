@@ -1,3 +1,19 @@
+/*
+ * Copyright (C) 2021 Edouard Fouché
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 package com.edouardfouche.monitoring.bandits.nonstationary
 
 import breeze.stats.distributions.Gaussian
@@ -31,7 +47,6 @@ case class MP_SW_UCB(windowsize: Int)(val stream: Simulator, val reward: Reward,
     countsbuffer = (0 until narms).map(x => (0 to windowsize).toArray.map(y => 0.0)).toArray
   }
 
-  // return a vector a 2-tuples (arms) and a gain
   def next: (Array[(Int, Int)], Array[Double], Double) = {
     val confidences = counts.map(x =>
       if(t==0.0 | x == 0.0) (0+Gaussian(0, 1).draw()*0.000001).max(0)
