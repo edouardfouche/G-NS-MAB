@@ -31,8 +31,8 @@ import com.edouardfouche.streamsimulator.CachedStreamSimulator
   * Created by fouchee on 12.07.17.
   * This experiment compares the behavior of various bandits against real-world data (see Paper)
   */
-object BanditRealWorld_Zozo_minus extends BanditExperiment {
-  val attributes = List("bandit","dataset","scalingstrategy","k","gain","cputime", "iteration")
+object BanditRealWorld_Zozo_bts extends BanditExperiment {
+  val attributes = List("bandit", "dataset", "scalingstrategy", "k", "gain", "cputime", "iteration")
 
   val data: DataRef = zozo_bts_all_minus
   val streamsimulator = CachedStreamSimulator(data)

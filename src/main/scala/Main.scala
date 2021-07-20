@@ -84,11 +84,11 @@ object Main extends LazyLogging {
     }
     case "BanditRealWorld" => {
       BanditRealWorld_Bioliq.run()
-      BanditRealWorld_Zozo_minus.run()
+      BanditRealWorld_Zozo_bts.run()
     }
 
     case "BanditRealWorld_Zozo_unif" => BanditRealWorld_Zozo_unif.run()
-    case "BanditRealWorld_Zozo_minus" => BanditRealWorld_Zozo_minus.run()
+    case "BanditRealWorld_Zozo_bts" => BanditRealWorld_Zozo_bts.run()
     case "BanditRealWorld_Bioliq" => BanditRealWorld_Bioliq.run()
     case "BanditRealWorld_Bioliq_ADWIN" => BanditRealWorld_Bioliq_ADWIN.run()
     case _ => throw new Error(s"Unknown experiment $arg")
