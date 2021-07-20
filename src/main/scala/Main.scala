@@ -60,37 +60,30 @@ object Main extends LazyLogging {
   }
 
   def experimentFactory(arg: String): Unit = arg match {
-    case "BanditAbrupt" => BanditNonStaticAbrupt.run()
-    case "BanditGradual" => BanditNonStaticGradual.run()
-    case "BanditStatic" => BanditStatic.run()
-
-    case "BanditGlobal" => {
-      BanditNonStaticAbruptGlobal_ADWIN.run()
-      BanditNonStaticGradualGlobal_ADWIN.run()
+    case "G-NS-MAB" => { // Run the full experiment suite
       BanditNonStaticAbruptGlobal.run()
       BanditNonStaticGradualGlobal.run()
-      BanditStatic.run()
-    }
-
-    case "BanditNonStaticGradualGlobal_ADWIN" => BanditNonStaticGradualGlobal_ADWIN.run()
-    case "BanditNonStaticAbruptGlobal_ADWIN" => BanditNonStaticAbruptGlobal_ADWIN.run()
-    case "BanditNonStaticGradualGlobal" => BanditNonStaticGradualGlobal.run()
-    case "BanditNonStaticAbruptGlobal" => BanditNonStaticAbruptGlobal.run()
-
-    case "BanditSynthetic" => {
       BanditNonStaticAbrupt.run()
-      BanditNonStaticGradual.run()
       BanditStatic.run()
-    }
-    case "BanditRealWorld" => {
+      BanditNonStaticAbruptGlobal_ADWIN.run()
+      BanditNonStaticGradualGlobal_ADWIN.run()
       BanditRealWorld_Bioliq.run()
-      BanditRealWorld_Zozo_bts.run()
+      BanditRealWorld_Zozo_unif.run()
     }
-
-    case "BanditRealWorld_Zozo_unif" => BanditRealWorld_Zozo_unif.run()
-    case "BanditRealWorld_Zozo_bts" => BanditRealWorld_Zozo_bts.run()
-    case "BanditRealWorld_Bioliq" => BanditRealWorld_Bioliq.run()
+    // Individual handles
+    case "BanditAbrupt" => BanditNonStaticAbrupt.run() // ~30min, 120MB
+    case "BanditStatic" => BanditStatic.run() // ~30min, 115MB
+    case "BanditNonStaticGradualGlobal" => BanditNonStaticGradualGlobal.run() // ~30min, 130MB
+    case "BanditNonStaticAbruptGlobal" => BanditNonStaticAbruptGlobal.run() // ~30min, 130MB
+    case "BanditRealWorld_Zozo_unif" => BanditRealWorld_Zozo_unif.run() // ~40min, 180MB
+    case "BanditRealWorld_Bioliq" => BanditRealWorld_Bioliq.run() // ~1.5hours, 100MB
+    case "BanditNonStaticGradualGlobal_ADWIN" => BanditNonStaticGradualGlobal_ADWIN.run() // ~10min, 55MB
+    case "BanditNonStaticAbruptGlobal_ADWIN" => BanditNonStaticAbruptGlobal_ADWIN.run() // ~2hours, 55MB
+    // Extra experiments
     case "BanditRealWorld_Bioliq_ADWIN" => BanditRealWorld_Bioliq_ADWIN.run()
+    case "BanditRealWorld_Zozo_bts" => BanditRealWorld_Zozo_bts.run() // ~30min, 158MB
+    case "BanditGradual" => BanditNonStaticGradual.run()
+
     case _ => throw new Error(s"Unknown experiment $arg")
   }
   def warn(s: String): Unit = logger.warn(s)
