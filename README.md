@@ -83,7 +83,7 @@ pandas                    1.1.3
 seaborn                   0.11.0
 ```
 
-Each experiments have dedicated notebooks, in the folder `visualize/`:
+Each experiments have dedicated notebooks in the folder `visualize`. Plots are in `visualize/plots`
 
 ## Contributing
 
