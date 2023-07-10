@@ -5,7 +5,7 @@
 Welcome to the supplementary material for the paper:
 
 - Junpei Komiyama, Edouard Fouché and Junya Honda. 2021. Finite-time Analysis of Globally Nonstationary Multi-Armed
-  Bandits (Preprint)
+  Bandits (https://arxiv.org/abs/2107.11419)
 
 This repository contains the reference implementation of the "Globally Non-Stationary Multi-Armed Bandits" (G-NS-MAB).
 In particular, it features the implementation of the so-called ADR-bandit and ADS-bandit. It contains all the
