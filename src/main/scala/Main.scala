@@ -79,6 +79,8 @@ object Main extends LazyLogging {
     case "BanditRealWorld_Bioliq" => BanditRealWorld_Bioliq.run() // ~1.5hours, 100MB
     case "BanditNonStaticGradualGlobal_ADWIN" => BanditNonStaticGradualGlobal_ADWIN.run() // ~10min, 55MB
     case "BanditNonStaticAbruptGlobal_ADWIN" => BanditNonStaticAbruptGlobal_ADWIN.run() // ~2hours, 55MB
+    case "BanditNonStaticAbruptGlobal_Mukherjee" => BanditNonStaticAbruptGlobal_Mukherjee.run() // ~2hours, 55MB
+    case "BanditNonStaticAbruptGlobal_ADR_v5" => BanditNonStaticAbruptGlobal_ADR_v5.run() // ~1hour local laptop, 16.8MB
     // Extra experiments
     case "BanditRealWorld_Bioliq_ADWIN" => BanditRealWorld_Bioliq_ADWIN.run()
     case "BanditRealWorld_Zozo_bts" => BanditRealWorld_Zozo_bts.run() // ~30min, 158MB

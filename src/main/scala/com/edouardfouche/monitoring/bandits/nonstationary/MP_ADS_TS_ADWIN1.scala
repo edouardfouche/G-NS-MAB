@@ -87,6 +87,7 @@ case class MP_ADS_TS_ADWIN1(delta: Double, ADR: Boolean = false)(val stream: Sim
             val y: (Int, Double) = cumulative_history(x)(i)
             if (math.abs((y._2 / y._1.toDouble) - (st - y._2) / (nt.toDouble - y._1.toDouble)) > epsilon(y._1, nt - y._1)) {
               changedetected = true
+              //println(s"TS-ADWIN Change detected at time $t on arm $x")
               if(ADR) { //ADR
                 (0 until narms).foreach { z => cumulative_history(z) = Array[(Int, Double)]() } // Reset entire memory
                 history = List()

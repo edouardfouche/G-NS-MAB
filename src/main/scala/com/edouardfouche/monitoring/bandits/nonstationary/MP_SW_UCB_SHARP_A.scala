@@ -24,7 +24,7 @@ import com.edouardfouche.streamsimulator.Simulator
 
 /**
   * Sliding-Window UCB# (SW-UCB#) with Multiple Plays -- For abrupt environment
-  * As in "On  abruptly-changing and  slowly-varying  multiarmed bandit problems" (Wei and Srivastava, 2018)
+  * As in "On abruptly-changing and  slowly-varying  multiarmed bandit problems" (Wei and Srivastava, 2018)
   *
   * @param nu              a value in [0,1) that quantifies how much the stream changes in abrupt environment
   * @param lambda          a real value that quantifies how much the stream changes

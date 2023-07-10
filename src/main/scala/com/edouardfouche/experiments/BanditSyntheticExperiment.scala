@@ -18,8 +18,6 @@ package com.edouardfouche.experiments
 
 import breeze.linalg
 import breeze.stats.distributions.{RandBasis, ThreadLocalRandomGenerator}
-import com.edouardfouche.monitoring.bandits.adversarial.Exp3M
-import com.edouardfouche.monitoring.bandits.stationary._
 import com.edouardfouche.monitoring.rewards.AbsoluteThreshold
 import com.edouardfouche.monitoring.scalingstrategies._
 import com.edouardfouche.preprocess._
@@ -34,7 +32,7 @@ trait BanditSyntheticExperiment extends BanditExperiment {
   val attributes = List("bandit","dataset","scalingstrategy","k","gain","cputime", "iteration")
 
   val lmin: Int
-  val lmax: Int
+  //val lmax: Int
   val d: Int
 
   val generator: Scenario
@@ -45,18 +43,18 @@ trait BanditSyntheticExperiment extends BanditExperiment {
 
   val nRep: Int
 
-  val banditConstructors = Vector(
-    CUCB,
-    MPKLUCB, MPKLUCBPLUS,
-    MPTS, MPOTS,
-    Exp3M,
-  )
+  /*  override val banditConstructors = Vector(
+      CUCB,
+      MPKLUCB, MPKLUCBPLUS,
+      MPTS, MPOTS,
+      Exp3M,
+    )*/
 
   def run(): Unit = {
     info(s"${formatter.format(java.util.Calendar.getInstance().getTime)} - Starting com.edouardfouche.experiments - ${this.getClass.getSimpleName}")
     // display parameters
     info(s"Parameters:")
-    info(s"lmin:$lmin, lmax: $lmax")
+    // info(s"lmin:$lmin, lmax: $lmax")
     info(s"d:$d")
     info(s"generator: ${generator.id}")
     info(s"scalingstrategies: ${scalingstrategies.map(_.name) mkString ","}")
@@ -72,9 +70,9 @@ trait BanditSyntheticExperiment extends BanditExperiment {
     }.toArray
 
     for {
-      scalingstrategy <- scalingstrategies.par
+      scalingstrategy <- scalingstrategies //.par
     } {
-      for{
+      for {
         banditConstructor <- banditConstructors.zipWithIndex.par
       } {
         var allgains: linalg.Vector[Double] = linalg.Vector((1 to simulators(0).nbatches).map(x => 0.0).toArray)
@@ -84,7 +82,7 @@ trait BanditSyntheticExperiment extends BanditExperiment {
         for {
           rep <- 0 until nRep
         } {
-          val bandit = banditConstructor._1(simulators(rep).copy(), reward, scalingstrategy, lmax)
+          val bandit = banditConstructor._1(simulators(rep).copy(), reward, scalingstrategy, scalingstrategy.k)
           val (gains, ks, cpu) = fullrunnerGainsKsCPU(bandit, Array[Double](), Array[Int](), Array[Double]())
           if (rep % 1 == 0) info(s"Reached rep $rep with bandit ${bandit.name}, ${scalingstrategy.name}")
           allgains = allgains +:+ (breeze.linalg.Vector(gains) *:* (1.0 / nRep))
@@ -92,17 +90,17 @@ trait BanditSyntheticExperiment extends BanditExperiment {
           allcpu = allcpu +:+ (breeze.linalg.Vector(cpu.map(_.toDouble)) *:* (1.0 / nRep))
         }
 
-        val bandit = banditConstructor._1(simulators(0), reward, scalingstrategy, lmax)
+        val bandit = banditConstructor._1(simulators(0), reward, scalingstrategy, scalingstrategy.k)
         for{
           step <- 0 until allgains.length
-        }{
+        } {
           val summary = ExperimentSummary(attributes)
           summary.add("bandit", bandit.name)
           summary.add("dataset", bandit.stream.dataset.id)
           summary.add("scalingstrategy", bandit.scalingstrategy.name)
-          summary.add("k",  "%.2f".format(allks(step)))
-          summary.add("gain",  "%.2f".format(allgains(step)))
-          summary.add("cputime", "%.4f".format(allcpu(step)))
+          summary.add("k", "%.2f".format(allks(step)).replace(",", "."))
+          summary.add("gain", "%.2f".format(allgains(step)).replace(",", "."))
+          summary.add("cputime", "%.4f".format(allcpu(step)).replace(",", "."))
           summary.add("iteration", step)
           summary.write(summaryPath)
         }

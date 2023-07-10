@@ -23,10 +23,14 @@ trait BanditAdwin extends Bandit {
   val delta: Double // Parameter for adwin
 
   // Initialize  the history of updates
-  var history: List[scala.collection.mutable.Map[Int,Double]] = List() // first el in the update for count, and last in the update for weight
+  var history: List[scala.collection.mutable.Map[Int, Double]] = List() // first el is the update for count, and last is the update for weight
+  var historymonitored: List[scala.collection.mutable.Map[Int, (Double, Boolean)]] = List() // first el in the update for count, and
+  // last is a tuple with the update for weight and whether it was a monitoring round
+
 
   override def reset: Unit = {
     super.reset
     history = List()
+    historymonitored = List()
   }
 }

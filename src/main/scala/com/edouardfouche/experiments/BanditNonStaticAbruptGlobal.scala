@@ -16,80 +16,26 @@
  */
 package com.edouardfouche.experiments
 
-import com.edouardfouche.monitoring.bandits.adversarial._
-import com.edouardfouche.monitoring.bandits.nonstationary._
-import com.edouardfouche.monitoring.bandits.oracles.{OracleAbruptGlobal, OracleDynamic, OracleRandom, OracleStatic}
-import com.edouardfouche.monitoring.bandits.stationary._
 import com.edouardfouche.monitoring.scalingstrategies._
 import com.edouardfouche.preprocess._
 
 /**
   * Created by fouchee on 12.07.17.
-  * This experiment compares the behavior of various bandits in the face of a "shutdown" change (see ShutdownGenerator)
+  * This experiment compares the behavior of various bandits in the face of an abrupt global change
   */
 object BanditNonStaticAbruptGlobal extends BanditSyntheticExperiment {
   val d = 100
   val lmin = 1
-  val lmax = d
+  val lmax: Int = d
 
-  val generator= AbruptGlobalGenerator(d)
+  val generator: AbruptGlobalGenerator = AbruptGlobalGenerator(d)
 
   val nRep = 100
 
   val scalingstrategies: Array[ScalingStrategy] = Array(
     //NoScaling(10),
-    NoScaling(5),
-    NoScaling(2),
+    //NoScaling(5),
+    //NoScaling(2),
     NoScaling(1)
-  )
-
-  override val banditConstructors = Vector(
-    // Oracles
-    OracleDynamic,
-    OracleStatic,
-    OracleRandom,
-    OracleAbruptGlobal,
-
-    // Static
-    MPTS, MPKLUCB,
-    MP_E_Greedy(0.7)(_, _, _, _), MP_E_Greedy(0.8)(_, _, _, _),
-    MP_E_Greedy(0.9)(_, _, _, _), MP_E_Greedy(0.99)(_, _, _, _),
-
-    // Passive approaches
-    MP_D_TS(0.7)(_,_,_,_), MP_D_TS(0.8)(_,_,_,_), MP_D_TS(0.9)(_,_,_,_), MP_D_TS(0.99)(_,_,_,_),
-    MP_D_UCB(0.7)(_,_,_,_), MP_D_UCB(0.8)(_,_,_,_), MP_D_UCB(0.9)(_,_,_,_), MP_D_UCB(0.99)(_,_,_,_),
-    MP_SW_UCB(100)(_, _, _, _), MP_SW_UCB(500)(_, _, _, _), MP_SW_UCB(1000)(_, _, _, _), MP_SW_UCB(5000)(_, _, _, _),
-    MP_SW_TS(100)(_, _, _, _), MP_SW_TS(500)(_, _, _, _), MP_SW_TS(1000)(_, _, _, _), MP_SW_TS(5000)(_, _, _, _),
-    MP_SW_UCB_SHARP_A(0.1, 12.3)(_,_,_,_),
-    MP_SW_UCB_SHARP_G(0.1, 4.3)(_,_,_,_),
-    MP_SW_UCB_SHARP_A(0.2, 12.3)(_,_,_,_),
-    MP_SW_UCB_SHARP_G(0.2, 4.3)(_,_,_,_),
-    MP_RExp3(100)(_,_,_,_),
-    MP_RExp3(500)(_,_,_,_),
-    MP_RExp3(1000)(_,_,_,_),
-    MP_RExp3(5000)(_,_,_,_),
-
-    // Active
-    MP_GLR_KL_UCB_G(_,_,_,_),
-    MP_GLR_KL_UCB_L(_,_,_,_),
-    MP_M_UCB(1000, 10)(_,_,_,_), MP_M_UCB(5000, 10)(_,_,_,_),
-    MP_M_UCB(1000, 100)(_,_,_,_), MP_M_UCB(5000, 100)(_,_,_,_),
-
-    // Ours
-    MP_ADS_TS_ADWIN1(0.1)(_,_,_,_),
-    MP_ADS_TS_ADWIN1(0.01)(_,_,_,_),
-    MP_ADS_TS_ADWIN1(0.001)(_,_,_,_),
-    MP_ADS_TS_ADWIN1(0.0001)(_,_,_,_),
-    MP_ADS_TS_ADWIN1(0.00001)(_,_,_,_),
-    MP_ADS_TS_ADWIN1(0.1,ADR=true)(_,_,_,_),
-    MP_ADS_TS_ADWIN1(0.01,ADR=true)(_,_,_,_),
-    MP_ADS_TS_ADWIN1(0.001,ADR=true)(_,_,_,_),
-    MP_ADS_TS_ADWIN1(0.0001,ADR=true)(_,_,_,_),
-    MP_ADS_TS_ADWIN1(0.00001,ADR=true)(_,_,_,_),
-    MP_ADR_Elimination_UCB(0.1)(_,_,_,_),
-    MP_ADR_Elimination_UCB(0.01)(_,_,_,_),
-    MP_ADR_Elimination_UCB(0.001)(_,_,_,_),
-    MP_ADR_Elimination_UCB(0.0001)(_,_,_,_),
-    MP_ADR_Elimination_UCB(0.00001)(_,_,_,_),
   )
 }

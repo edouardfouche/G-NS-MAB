@@ -16,14 +16,17 @@
  */
 package com.edouardfouche.experiments
 
-import java.io.{File, FileWriter}
-
 import com.edouardfouche.monitoring.bandits._
+import com.edouardfouche.monitoring.bandits.adversarial.MP_RExp3
+import com.edouardfouche.monitoring.bandits.nonstationary._
+import com.edouardfouche.monitoring.bandits.oracles._
+import com.edouardfouche.monitoring.bandits.stationary.{MPKLUCB, MPTS}
 import com.edouardfouche.utils
 import com.edouardfouche.utils.StopWatch
 import com.typesafe.scalalogging.LazyLogging
 import org.slf4j.MDC
 
+import java.io.{File, FileWriter}
 import scala.annotation.tailrec
 
 /**
@@ -46,6 +49,221 @@ trait BanditExperiment extends LazyLogging {
 
   info(s"Started on: ${java.net.InetAddress.getLocalHost.getHostName}")
 
+  val banditConstructors = Vector(
+    // Oracles
+    OracleDynamic,
+    OracleStatic,
+    OracleRandom,
+    OracleAbrupt,
+    OracleGradualGlobal,
+    OracleAbruptGlobal,
+
+    // Static
+    MPTS, MPKLUCB,
+    MP_E_Greedy(0.7)(_, _, _, _), MP_E_Greedy(0.8)(_, _, _, _), MP_E_Greedy(0.9)(_, _, _, _), MP_E_Greedy(0.99)(_, _, _, _),
+
+    // Passive approaches
+    MP_D_TS(0.7)(_, _, _, _), MP_D_TS(0.8)(_, _, _, _), MP_D_TS(0.9)(_, _, _, _), MP_D_TS(0.99)(_, _, _, _), MP_D_TS(0.999)(_, _, _, _),
+    MP_D_UCB(0.7)(_, _, _, _), MP_D_UCB(0.8)(_, _, _, _), MP_D_UCB(0.9)(_, _, _, _), MP_D_UCB(0.99)(_, _, _, _), MP_D_UCB(0.999)(_, _, _, _),
+    MP_SW_UCB(100)(_, _, _, _), MP_SW_UCB(500)(_, _, _, _), MP_SW_UCB(1000)(_, _, _, _), MP_SW_UCB(5000)(_, _, _, _),
+    MP_SW_TS(100)(_, _, _, _), MP_SW_TS(500)(_, _, _, _), MP_SW_TS(1000)(_, _, _, _), MP_SW_TS(5000)(_, _, _, _),
+    MP_SW_UCB_SHARP_A(0.1, 12.3)(_, _, _, _),
+    MP_SW_UCB_SHARP_G(0.1, 4.3)(_, _, _, _),
+    MP_SW_UCB_SHARP_A(0.2, 12.3)(_, _, _, _),
+    MP_SW_UCB_SHARP_G(0.2, 4.3)(_, _, _, _),
+    MP_RExp3(100)(_, _, _, _),
+    MP_RExp3(500)(_, _, _, _),
+    MP_RExp3(1000)(_, _, _, _),
+    MP_RExp3(5000)(_, _, _, _),
+
+    // Active
+    MP_GLR_KL_UCB_G(_, _, _, _),
+    MP_GLR_KL_UCB_L(_, _, _, _),
+    MP_M_UCB(1000, 10)(_, _, _, _), MP_M_UCB(5000, 10)(_, _, _, _),
+    MP_M_UCB(1000, 100)(_, _, _, _), MP_M_UCB(5000, 100)(_, _, _, _),
+
+    // Mukherjee
+    ImpCPD,
+    ImpCPD2,
+    ImpCPD3,
+    UCBL_CPD,
+
+    // Ours
+    MP_ADS_TS_ADWIN1(0.1)(_, _, _, _),
+    MP_ADS_TS_ADWIN1(0.01)(_, _, _, _),
+    MP_ADS_TS_ADWIN1(0.001)(_, _, _, _),
+    MP_ADS_TS_ADWIN1(0.0001)(_, _, _, _),
+    MP_ADS_TS_ADWIN1(0.00001)(_, _, _, _),
+    MP_ADS_TS_ADWIN1(0.000001)(_, _, _, _),
+    MP_ADS_TS_ADWIN1(0.0000001)(_, _, _, _),
+    MP_ADS_TS_ADWIN1(0.00000001)(_, _, _, _),
+    MP_ADS_TS_ADWIN1(0.000000000001)(_, _, _, _),
+    MP_ADS_TS_ADWIN1(0.000000000000001)(_, _, _, _),
+    MP_ADS_TS_ADWIN1_v2(0.1)(_, _, _, _),
+    MP_ADS_TS_ADWIN1_v2(0.01)(_, _, _, _),
+    MP_ADS_TS_ADWIN1_v2(0.001)(_, _, _, _),
+    MP_ADS_TS_ADWIN1_v2(0.0001)(_, _, _, _),
+    MP_ADS_TS_ADWIN1_v2(0.00001)(_, _, _, _),
+    MP_ADS_TS_ADWIN1_v2(0.000001)(_, _, _, _),
+    MP_ADS_TS_ADWIN1_v2(0.0000001)(_, _, _, _),
+    MP_ADS_TS_ADWIN1_v2(0.00000001)(_, _, _, _),
+    MP_ADS_TS_ADWIN1_v2(0.000000000001)(_, _, _, _),
+    MP_ADS_TS_ADWIN1_v2(0.000000000000001)(_, _, _, _),
+
+    MP_ADR_TS_ADWIN1_v5(0.1)(_, _, _, _),
+    MP_ADR_TS_ADWIN1_v5(0.01)(_, _, _, _),
+    MP_ADR_TS_ADWIN1_v5(0.001)(_, _, _, _),
+    MP_ADR_TS_ADWIN1_v5(0.0001)(_, _, _, _),
+    MP_ADR_TS_ADWIN1_v5(0.00001)(_, _, _, _),
+    MP_ADR_TS_ADWIN1_v5(0.000001)(_, _, _, _),
+    MP_ADR_TS_ADWIN1_v5(0.0000001)(_, _, _, _),
+    MP_ADR_TS_ADWIN1_v5(0.00000001)(_, _, _, _),
+    MP_ADR_TS_ADWIN1_v5(0.000000000001)(_, _, _, _),
+    MP_ADR_TS_ADWIN1_v5(0.000000000000001)(_, _, _, _),
+
+    MP_ADS_TS_ADWIN1(0.1, ADR = true)(_, _, _, _),
+    MP_ADS_TS_ADWIN1(0.01, ADR = true)(_, _, _, _),
+    MP_ADS_TS_ADWIN1(0.001, ADR = true)(_, _, _, _),
+    MP_ADS_TS_ADWIN1(0.0001, ADR = true)(_, _, _, _),
+    MP_ADS_TS_ADWIN1(0.00001, ADR = true)(_, _, _, _),
+    MP_ADS_TS_ADWIN1(0.000001, ADR = true)(_, _, _, _),
+    MP_ADS_TS_ADWIN1(0.0000001, ADR = true)(_, _, _, _),
+    MP_ADS_TS_ADWIN1(0.00000001, ADR = true)(_, _, _, _),
+    MP_ADS_TS_ADWIN1(0.000000000001, ADR = true)(_, _, _, _),
+    MP_ADS_TS_ADWIN1(0.000000000000001, ADR = true)(_, _, _, _),
+    MP_ADS_TS_ADWIN1_v2(0.1, ADR = true)(_, _, _, _),
+    MP_ADS_TS_ADWIN1_v2(0.01, ADR = true)(_, _, _, _),
+    MP_ADS_TS_ADWIN1_v2(0.001, ADR = true)(_, _, _, _),
+    MP_ADS_TS_ADWIN1_v2(0.0001, ADR = true)(_, _, _, _),
+    MP_ADS_TS_ADWIN1_v2(0.00001, ADR = true)(_, _, _, _),
+    MP_ADS_TS_ADWIN1_v2(0.000001, ADR = true)(_, _, _, _),
+    MP_ADS_TS_ADWIN1_v2(0.0000001, ADR = true)(_, _, _, _),
+    MP_ADS_TS_ADWIN1_v2(0.00000001, ADR = true)(_, _, _, _),
+    MP_ADS_TS_ADWIN1_v2(0.000000000001, ADR = true)(_, _, _, _),
+    MP_ADS_TS_ADWIN1_v2(0.000000000000001, ADR = true)(_, _, _, _),
+    MP_ADR_Elimination_UCB(0.1)(_, _, _, _),
+    MP_ADR_Elimination_UCB(0.01)(_, _, _, _),
+    MP_ADR_Elimination_UCB(0.001)(_, _, _, _),
+    MP_ADR_Elimination_UCB(0.0001)(_, _, _, _),
+    MP_ADR_Elimination_UCB(0.00001)(_, _, _, _),
+    MP_ADR_Elimination_UCB(0.000001)(_, _, _, _),
+    MP_ADR_Elimination_UCB(0.0000001)(_, _, _, _),
+    MP_ADR_Elimination_UCB(0.00000001)(_, _, _, _),
+    MP_ADR_Elimination_UCB(0.000000000001)(_, _, _, _),
+    MP_ADR_Elimination_UCB(0.000000000000001)(_, _, _, _),
+    MP_ADS_KL_UCB_ADWIN1(0.1)(_, _, _, _),
+    MP_ADS_KL_UCB_ADWIN1(0.01)(_, _, _, _),
+    MP_ADS_KL_UCB_ADWIN1(0.001)(_, _, _, _),
+    MP_ADS_KL_UCB_ADWIN1(0.0001)(_, _, _, _),
+    MP_ADS_KL_UCB_ADWIN1(0.00001)(_, _, _, _),
+    MP_ADS_KL_UCB_ADWIN1(0.000001)(_, _, _, _),
+    MP_ADS_KL_UCB_ADWIN1(0.0000001)(_, _, _, _),
+    MP_ADS_KL_UCB_ADWIN1(0.00000001)(_, _, _, _),
+    MP_ADS_KL_UCB_ADWIN1(0.000000000001)(_, _, _, _),
+    MP_ADS_KL_UCB_ADWIN1(0.000000000000001)(_, _, _, _),
+    MP_ADS_KL_UCB_ADWIN1_v2(0.1)(_, _, _, _),
+    MP_ADS_KL_UCB_ADWIN1_v2(0.01)(_, _, _, _),
+    MP_ADS_KL_UCB_ADWIN1_v2(0.001)(_, _, _, _),
+    MP_ADS_KL_UCB_ADWIN1_v2(0.0001)(_, _, _, _),
+    MP_ADS_KL_UCB_ADWIN1_v2(0.00001)(_, _, _, _),
+    MP_ADS_KL_UCB_ADWIN1_v2(0.000001)(_, _, _, _),
+    MP_ADS_KL_UCB_ADWIN1_v2(0.0000001)(_, _, _, _),
+    MP_ADS_KL_UCB_ADWIN1_v2(0.00000001)(_, _, _, _),
+    MP_ADS_KL_UCB_ADWIN1_v2(0.000000000001)(_, _, _, _),
+    MP_ADS_KL_UCB_ADWIN1_v2(0.000000000000001)(_, _, _, _),
+
+    MP_ADR_KL_UCB_ADWIN1_v5(0.1)(_, _, _, _),
+    MP_ADR_KL_UCB_ADWIN1_v5(0.01)(_, _, _, _),
+    MP_ADR_KL_UCB_ADWIN1_v5(0.001)(_, _, _, _),
+    MP_ADR_KL_UCB_ADWIN1_v5(0.0001)(_, _, _, _),
+    MP_ADR_KL_UCB_ADWIN1_v5(0.00001)(_, _, _, _),
+    MP_ADR_KL_UCB_ADWIN1_v5(0.000001)(_, _, _, _),
+    MP_ADR_KL_UCB_ADWIN1_v5(0.0000001)(_, _, _, _),
+    MP_ADR_KL_UCB_ADWIN1_v5(0.00000001)(_, _, _, _),
+    MP_ADR_KL_UCB_ADWIN1_v5(0.000000000001)(_, _, _, _),
+    MP_ADR_KL_UCB_ADWIN1_v5(0.000000000000001)(_, _, _, _),
+
+    MP_ADS_KL_UCB_ADWIN1(0.1, ADR = true)(_, _, _, _),
+    MP_ADS_KL_UCB_ADWIN1(0.01, ADR = true)(_, _, _, _),
+    MP_ADS_KL_UCB_ADWIN1(0.001, ADR = true)(_, _, _, _),
+    MP_ADS_KL_UCB_ADWIN1(0.0001, ADR = true)(_, _, _, _),
+    MP_ADS_KL_UCB_ADWIN1(0.00001, ADR = true)(_, _, _, _),
+    MP_ADS_KL_UCB_ADWIN1(0.000001, ADR = true)(_, _, _, _),
+    MP_ADS_KL_UCB_ADWIN1(0.0000001, ADR = true)(_, _, _, _),
+    MP_ADS_KL_UCB_ADWIN1(0.00000001, ADR = true)(_, _, _, _),
+    MP_ADS_KL_UCB_ADWIN1(0.000000000001, ADR = true)(_, _, _, _),
+    MP_ADS_KL_UCB_ADWIN1(0.000000000000001, ADR = true)(_, _, _, _),
+    MP_ADS_KL_UCB_ADWIN1_v2(0.1, ADR = true)(_, _, _, _),
+    MP_ADS_KL_UCB_ADWIN1_v2(0.01, ADR = true)(_, _, _, _),
+    MP_ADS_KL_UCB_ADWIN1_v2(0.001, ADR = true)(_, _, _, _),
+    MP_ADS_KL_UCB_ADWIN1_v2(0.0001, ADR = true)(_, _, _, _),
+    MP_ADS_KL_UCB_ADWIN1_v2(0.00001, ADR = true)(_, _, _, _),
+    MP_ADS_KL_UCB_ADWIN1_v2(0.000001, ADR = true)(_, _, _, _),
+    MP_ADS_KL_UCB_ADWIN1_v2(0.0000001, ADR = true)(_, _, _, _),
+    MP_ADS_KL_UCB_ADWIN1_v2(0.00000001, ADR = true)(_, _, _, _),
+    MP_ADS_KL_UCB_ADWIN1_v2(0.000000000001, ADR = true)(_, _, _, _),
+    MP_ADS_KL_UCB_ADWIN1_v2(0.000000000000001, ADR = true)(_, _, _, _),
+  )
+
+  val banditConstructors_ADWIN = Vector(
+    OracleDynamic,
+    OracleStatic,
+    OracleRandom,
+    OracleAbruptGlobal,
+    OracleAbruptGlobal,
+    // Ours
+    MP_ADS_TS_ADWIN1(0.1)(_, _, _, _),
+    MP_ADS_TS_ADWIN1(0.01)(_, _, _, _),
+    MP_ADS_TS_ADWIN1(0.001)(_, _, _, _),
+    MP_ADS_TS_ADWIN1(0.0001)(_, _, _, _),
+    MP_ADS_TS_ADWIN1(0.00001)(_, _, _, _),
+    MP_ADS_TS_ADWIN1(0.000001)(_, _, _, _),
+    MP_ADS_TS_ADWIN1(0.0000001)(_, _, _, _),
+    MP_ADS_TS_ADWIN1(0.00000001)(_, _, _, _),
+    MP_ADS_TS_ADWIN1(0.000000000001)(_, _, _, _),
+    MP_ADS_TS_ADWIN1(0.000000000000001)(_, _, _, _),
+    MP_ADS_TS_ADWIN1(0.1, ADR = true)(_, _, _, _),
+    MP_ADS_TS_ADWIN1(0.01, ADR = true)(_, _, _, _),
+    MP_ADS_TS_ADWIN1(0.001, ADR = true)(_, _, _, _),
+    MP_ADS_TS_ADWIN1(0.0001, ADR = true)(_, _, _, _),
+    MP_ADS_TS_ADWIN1(0.00001, ADR = true)(_, _, _, _),
+    MP_ADS_TS_ADWIN1(0.000001, ADR = true)(_, _, _, _),
+    MP_ADS_TS_ADWIN1(0.0000001, ADR = true)(_, _, _, _),
+    MP_ADS_TS_ADWIN1(0.00000001, ADR = true)(_, _, _, _),
+    MP_ADS_TS_ADWIN1(0.000000000001, ADR = true)(_, _, _, _),
+    MP_ADS_TS_ADWIN1(0.000000000000001, ADR = true)(_, _, _, _),
+    MP_ADR_Elimination_UCB(0.1)(_, _, _, _),
+    MP_ADR_Elimination_UCB(0.01)(_, _, _, _),
+    MP_ADR_Elimination_UCB(0.001)(_, _, _, _),
+    MP_ADR_Elimination_UCB(0.0001)(_, _, _, _),
+    MP_ADR_Elimination_UCB(0.00001)(_, _, _, _),
+    MP_ADR_Elimination_UCB(0.000001)(_, _, _, _),
+    MP_ADR_Elimination_UCB(0.0000001)(_, _, _, _),
+    MP_ADR_Elimination_UCB(0.00000001)(_, _, _, _),
+    MP_ADR_Elimination_UCB(0.000000000001)(_, _, _, _),
+    MP_ADR_Elimination_UCB(0.000000000000001)(_, _, _, _),
+    MP_ADS_KL_UCB_ADWIN1(0.1)(_, _, _, _),
+    MP_ADS_KL_UCB_ADWIN1(0.01)(_, _, _, _),
+    MP_ADS_KL_UCB_ADWIN1(0.001)(_, _, _, _),
+    MP_ADS_KL_UCB_ADWIN1(0.0001)(_, _, _, _),
+    MP_ADS_KL_UCB_ADWIN1(0.00001)(_, _, _, _),
+    MP_ADS_KL_UCB_ADWIN1(0.000001)(_, _, _, _),
+    MP_ADS_KL_UCB_ADWIN1(0.0000001)(_, _, _, _),
+    MP_ADS_KL_UCB_ADWIN1(0.00000001)(_, _, _, _),
+    MP_ADS_KL_UCB_ADWIN1(0.000000000001)(_, _, _, _),
+    MP_ADS_KL_UCB_ADWIN1(0.000000000000001)(_, _, _, _),
+    MP_ADS_KL_UCB_ADWIN1(0.1, ADR = true)(_, _, _, _),
+    MP_ADS_KL_UCB_ADWIN1(0.01, ADR = true)(_, _, _, _),
+    MP_ADS_KL_UCB_ADWIN1(0.001, ADR = true)(_, _, _, _),
+    MP_ADS_KL_UCB_ADWIN1(0.0001, ADR = true)(_, _, _, _),
+    MP_ADS_KL_UCB_ADWIN1(0.00001, ADR = true)(_, _, _, _),
+    MP_ADS_KL_UCB_ADWIN1(0.000001, ADR = true)(_, _, _, _),
+    MP_ADS_KL_UCB_ADWIN1(0.0000001, ADR = true)(_, _, _, _),
+    MP_ADS_KL_UCB_ADWIN1(0.00000001, ADR = true)(_, _, _, _),
+    MP_ADS_KL_UCB_ADWIN1(0.000000000001, ADR = true)(_, _, _, _),
+    MP_ADS_KL_UCB_ADWIN1(0.000000000000001, ADR = true)(_, _, _, _),
+  )
+
   def run(): Unit
 
   def info(s: String): Unit = logger.info(s)
@@ -53,7 +271,6 @@ trait BanditExperiment extends LazyLogging {
   @tailrec
   final def runner(bandit: Bandit, iteration: Int, gain: Double, matrixdiff: Double, rep: Int): (Double, Double) = {
     // if (iteration % 200 == 0) info(s"Reached iteration $iteration with bandit ${bandit.name}")
-
     val ref = bandit.stream.cache
 
     val nextresult_watch = StopWatch.measureTime(bandit.next)

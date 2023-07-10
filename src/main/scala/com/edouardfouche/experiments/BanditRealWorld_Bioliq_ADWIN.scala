@@ -18,7 +18,6 @@ package com.edouardfouche.experiments
 
 import breeze.linalg
 import com.edouardfouche.experiments.Data._
-import com.edouardfouche.monitoring.bandits.nonstationary._
 import com.edouardfouche.monitoring.rewards.AbsoluteThreshold
 import com.edouardfouche.monitoring.scalingstrategies.{NoScaling, ScalingStrategy}
 import com.edouardfouche.preprocess.DataRef
@@ -27,6 +26,7 @@ import com.edouardfouche.streamsimulator.CachedStreamSimulator
 /**
   * Created by fouchee on 12.07.17.
   * This experiment compares the behavior of various bandits against real-world data (see Paper)
+  * The difference with BanditRealWorld_Bioliq is that it also reports historylength
   */
 object BanditRealWorld_Bioliq_ADWIN extends BanditExperiment {
   val attributes = List("bandit","dataset","scalingstrategy","k","gain","cputime", "historylength", "iteration")
@@ -37,36 +37,24 @@ object BanditRealWorld_Bioliq_ADWIN extends BanditExperiment {
   val reward = AbsoluteThreshold(2)
 
   val lmin = 1
-  val lmax = streamsimulator.npairs
+  // val lmax = streamsimulator.npairs
 
   val nRep = 100
   //val nRep = 1
 
+  override val banditConstructors = banditConstructors_ADWIN
   val scalingstrategies: Array[ScalingStrategy] = Array(
     // NoScaling(10),
-    NoScaling(5),
-    NoScaling(2),
+    // NoScaling(5),
+    // NoScaling(2),
     NoScaling(1)
-  )
-
-  val banditConstructors = Vector(
-    // Ours
-    MP_ADS_TS_ADWIN1(0.1)(_, _, _, _),
-    MP_ADS_TS_ADWIN1(0.01)(_, _, _, _),
-    MP_ADS_TS_ADWIN1(0.001)(_, _, _, _),
-    MP_ADS_TS_ADWIN1(0.1, ADR = true)(_, _, _, _),
-    MP_ADS_TS_ADWIN1(0.01, ADR = true)(_, _, _, _),
-    MP_ADS_TS_ADWIN1(0.001, ADR = true)(_, _, _, _),
-    MP_ADR_Elimination_UCB(0.1)(_, _, _, _),
-    MP_ADR_Elimination_UCB(0.01)(_, _, _, _),
-    MP_ADR_Elimination_UCB(0.001)(_, _, _, _),
   )
 
   def run(): Unit = {
     info(s"${formatter.format(java.util.Calendar.getInstance().getTime)} - Starting com.edouardfouche.experiments - ${this.getClass.getSimpleName}")
     // display parameters
     info(s"Parameters:")
-    info(s"lmin:$lmin, lmax: $lmax")
+    // info(s"lmin:$lmin, lmax: $lmax")
     info(s"data:${data.id}")
     info(s"scalingstrategies: ${scalingstrategies.map(_.name) mkString ", "}")
     info(s"reward: ${reward.name}")
@@ -99,15 +87,15 @@ object BanditRealWorld_Bioliq_ADWIN extends BanditExperiment {
         val bandit = banditConstructor(streamsimulator.copy(), reward, scalingstrategy, scalingstrategy.k)
         for{
           step <- 0 until allgains.length
-        }{
+        } {
           val summary = ExperimentSummary(attributes)
           summary.add("bandit", bandit.name)
           summary.add("dataset", bandit.stream.dataset.id)
           summary.add("scalingstrategy", bandit.scalingstrategy.name)
-          summary.add("k",  "%.2f".format(allks(step)))
-          summary.add("gain",  "%.2f".format(allgains(step)))
-          summary.add("cputime", "%.4f".format(allcpu(step)))
-          summary.add("historylength", "%.4f".format(allhistorylengths(step)))
+          summary.add("k", "%.2f".format(allks(step)).replace(",", "."))
+          summary.add("gain", "%.2f".format(allgains(step)).replace(",", "."))
+          summary.add("cputime", "%.4f".format(allcpu(step)).replace(",", "."))
+          summary.add("historylength", "%.4f".format(allhistorylengths(step)).replace(",", "."))
           summary.add("iteration", step)
           summary.write(summaryPath)
         }

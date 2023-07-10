@@ -22,7 +22,7 @@ import com.edouardfouche.preprocess.DataRef
 // It computes -- or simulate -- an action an action computed on a this stream on a the basis of a sliding window
 /**
   * A Simulator "simulates" a stream, given as a DataRef.
-  * It computes -- or simulate -- an action an action computed on a this stream on a the basis of a sliding window
+  * It computes -- or simulate -- an action computed on a this stream on a the basis of a sliding window
   */
 trait Simulator {
   val dataset: DataRef

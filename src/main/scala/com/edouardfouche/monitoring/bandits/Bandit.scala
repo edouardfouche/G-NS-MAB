@@ -33,19 +33,21 @@ trait Bandit extends LazyLogging {
 
   var k: Int // number of pulls
 
-  val combinations: Array[(Int,Int)] = stream.pairs
+  val combinations: Array[(Int, Int)] = stream.pairs
   val ncols: Int = stream.ncols
   val narms: Int = stream.npairs
 
   require(k <= narms) // One cannot pull more arms than available
 
-  var initializationvalue = 1.0 // This is the value used for optimistic initilization // Set it to 0 for non-optimistic initialization
+  val initializationvalue = 1.0 // This is the value used for optimistic initilization // Set it to 0 for non-optimistic initialization
 
   /**
     * In our study, every bandit holds a dependency matrix. Here, we initialize it.
+    *
     * @return A matrix (in fact, squeezed to a 1-D vector) of zeros.
     */
   def init: linalg.Vector[Double] = linalg.Vector(combinations.map(x => 0.0))
+
   var currentMatrix: linalg.Vector[Double] = init
   val initial_k: Int = k
   var sums: Array[Double] = (0 until narms).map(_ => initializationvalue).toArray // Initialization the weights to maximal gain forces to exploration at the early phase
@@ -65,15 +67,15 @@ trait Bandit extends LazyLogging {
     stream.reset()
   }
 
-  def disable_optimistic: Unit = { // Reset AND set the initializationvalue to 0.0 (not optimistic anymore)
-    initializationvalue = 0.0
-    currentMatrix = init
-    k = initial_k
-    sums = (0 until narms).map(_ => initializationvalue).toArray
-    counts = sums.map(_ => initializationvalue)
-    t = initializationvalue
-    stream.reset()
-  }
+  /*  def disable_optimistic: Unit = { // Reset AND set the initializationvalue to 0.0 (not optimistic anymore)
+      initializationvalue = 0.0
+      currentMatrix = init
+      k = initial_k
+      sums = (0 until narms).map(_ => initializationvalue).toArray
+      counts = sums.map(_ => initializationvalue)
+      t = initializationvalue
+      stream.reset()
+    }*/
 
   /**
     * Obtain the next state of the stream, decide which arms to play and derive the corresponding reward

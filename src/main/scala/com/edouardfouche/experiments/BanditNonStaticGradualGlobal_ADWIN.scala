@@ -18,8 +18,6 @@ package com.edouardfouche.experiments
 
 import breeze.linalg
 import breeze.stats.distributions.{RandBasis, ThreadLocalRandomGenerator}
-import com.edouardfouche.monitoring.bandits.nonstationary._
-import com.edouardfouche.monitoring.bandits.oracles.{OracleAbruptGlobal, OracleDynamic, OracleGradualGlobal, OracleRandom, OracleStatic}
 import com.edouardfouche.monitoring.rewards.AbsoluteThreshold
 import com.edouardfouche.monitoring.scalingstrategies._
 import com.edouardfouche.preprocess._
@@ -28,53 +26,32 @@ import org.apache.commons.math3.random.MersenneTwister
 
 /**
   * Created by fouchee on 12.07.17.
-  * This experiment compares the behavior of various bandits in the face of a "shutdown" change (see ShutdownGenerator)
+  * This experiment compares the behavior of various bandits in the face of a gradual global change
+  * The difference with BanditNonStaticGradualGlobal is that it also reports historylength
   */
 object BanditNonStaticGradualGlobal_ADWIN extends BanditExperiment {
   val d = 100
   val lmin = 1
-  val lmax = d
+  //val lmax = d
 
   val attributes = List("bandit","dataset","scalingstrategy","k","gain","cputime", "historylength", "iteration")
   val reward = AbsoluteThreshold(1)
   val generator = GradualGlobalGenerator(d)
   val nRep = 100
 
+  override val banditConstructors = banditConstructors_ADWIN
   val scalingstrategies: Array[ScalingStrategy] = Array(
     //NoScaling(10),
-    NoScaling(5),
-    NoScaling(2),
+    //NoScaling(5),
+    //NoScaling(2),
     NoScaling(1)
-  )
-
-  val banditConstructors = Vector(
-    OracleDynamic,
-    OracleStatic,
-    OracleRandom,
-    OracleGradualGlobal,
-    // Ours
-    MP_ADS_TS_ADWIN1(0.1)(_,_,_,_),
-    MP_ADS_TS_ADWIN1(0.01)(_,_,_,_),
-    MP_ADS_TS_ADWIN1(0.001)(_,_,_,_),
-    MP_ADS_TS_ADWIN1(0.0001)(_,_,_,_),
-    MP_ADS_TS_ADWIN1(0.00001)(_,_,_,_),
-    MP_ADS_TS_ADWIN1(0.1,ADR=true)(_,_,_,_),
-    MP_ADS_TS_ADWIN1(0.01,ADR=true)(_,_,_,_),
-    MP_ADS_TS_ADWIN1(0.001,ADR=true)(_,_,_,_),
-    MP_ADS_TS_ADWIN1(0.0001,ADR=true)(_,_,_,_),
-    MP_ADS_TS_ADWIN1(0.00001,ADR=true)(_,_,_,_),
-    MP_ADR_Elimination_UCB(0.1)(_,_,_,_),
-    MP_ADR_Elimination_UCB(0.01)(_,_,_,_),
-    MP_ADR_Elimination_UCB(0.001)(_,_,_,_),
-    MP_ADR_Elimination_UCB(0.0001)(_,_,_,_),
-    MP_ADR_Elimination_UCB(0.00001)(_,_,_,_),
   )
 
   override def run(): Unit = {
     info(s"${formatter.format(java.util.Calendar.getInstance().getTime)} - Starting com.edouardfouche.experiments - ${this.getClass.getSimpleName}")
     // display parameters
     info(s"Parameters:")
-    info(s"lmin:$lmin, lmax: $lmax")
+    //info(s"lmin:$lmin, lmax: $lmax")
     info(s"d:$d")
     //info(s"generator: ${generator.id}")
     info(s"scalingstrategies: ${scalingstrategies.map(_.name) mkString ","}")
@@ -90,9 +67,9 @@ object BanditNonStaticGradualGlobal_ADWIN extends BanditExperiment {
     }.toArray
 
     for {
-      scalingstrategy <- scalingstrategies.par
+      scalingstrategy <- scalingstrategies //.par
     } {
-      for{
+      for {
         banditConstructor <- banditConstructors.zipWithIndex.par
       } {
         var allgains: linalg.Vector[Double] = linalg.Vector((1 to simulators(0).nbatches).map(x => 0.0).toArray)
@@ -105,7 +82,7 @@ object BanditNonStaticGradualGlobal_ADWIN extends BanditExperiment {
         } {
           //info(s"Starting com.edouardfouche.experiments with data: ${d.id}, configuration k: ${kratio}, rep=$rep")
           //val bandit = banditConstructor(streamsimulator.copy(), reward, scalingstrategy, scalingstrategy.k)
-          val bandit = banditConstructor._1(simulators(rep).copy(), reward, scalingstrategy, lmax)
+          val bandit = banditConstructor._1(simulators(rep).copy(), reward, scalingstrategy, scalingstrategy.k)
           if (rep % 1 == 0) info(s"Reached rep $rep with bandit ${bandit.name}, ${scalingstrategy.name}")
           val (gains, ks, cpu, historylengths) = fullrunnerGainsKsCPUW(bandit, Array[Double](), Array[Int](), Array[Double](), Array[Double]())
           allgains = allgains +:+ (breeze.linalg.Vector(gains) *:* (1.0/nRep))
@@ -114,18 +91,18 @@ object BanditNonStaticGradualGlobal_ADWIN extends BanditExperiment {
           allhistorylengths = allhistorylengths +:+ (breeze.linalg.Vector(historylengths.map(_.toDouble)) *:* (1.0/nRep))
         }
 
-        val bandit = banditConstructor._1(simulators(0), reward, scalingstrategy, lmax)
+        val bandit = banditConstructor._1(simulators(0), reward, scalingstrategy, scalingstrategy.k)
         for{
           step <- 0 until allgains.length
-        }{
+        } {
           val summary = ExperimentSummary(attributes)
           summary.add("bandit", bandit.name)
           summary.add("dataset", bandit.stream.dataset.id)
           summary.add("scalingstrategy", bandit.scalingstrategy.name)
-          summary.add("k",  "%.2f".format(allks(step)))
-          summary.add("gain",  "%.2f".format(allgains(step)))
-          summary.add("cputime", "%.4f".format(allcpu(step)))
-          summary.add("historylength", "%.4f".format(allhistorylengths(step)))
+          summary.add("k", "%.2f".format(allks(step)).replace(",", "."))
+          summary.add("gain", "%.2f".format(allgains(step)).replace(",", "."))
+          summary.add("cputime", "%.4f".format(allcpu(step)).replace(",", "."))
+          summary.add("historylength", "%.4f".format(allhistorylengths(step)).replace(",", "."))
           summary.add("iteration", step)
           summary.write(summaryPath)
         }

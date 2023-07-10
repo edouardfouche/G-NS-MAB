@@ -18,10 +18,6 @@ package com.edouardfouche.experiments
 
 import breeze.linalg
 import com.edouardfouche.experiments.Data._
-import com.edouardfouche.monitoring.bandits.adversarial._
-import com.edouardfouche.monitoring.bandits.nonstationary._
-import com.edouardfouche.monitoring.bandits.oracles._
-import com.edouardfouche.monitoring.bandits.stationary._
 import com.edouardfouche.monitoring.rewards.CurrentScore
 import com.edouardfouche.monitoring.scalingstrategies.{NoScaling, ScalingStrategy}
 import com.edouardfouche.preprocess.DataRef
@@ -40,86 +36,38 @@ object BanditRealWorld_Zozo_bts extends BanditExperiment {
   val reward = CurrentScore()
 
   val lmin = 1
-  val lmax = streamsimulator.npairs
+  // val lmax = streamsimulator.npairs
 
   val nRep = 100
   //val nRep = 1
 
   val scalingstrategies: Array[ScalingStrategy] = Array(
-    NoScaling(10),
-    NoScaling(5),
-    NoScaling(2),
+    // NoScaling(10),
+    // NoScaling(5),
+    // NoScaling(2),
     NoScaling(1)
-  )
-
-  val banditConstructors = Vector(
-    // Oracles
-    OracleDynamic,
-    OracleStatic,
-    OracleRandom,
-
-    // Static
-    MPTS, MPKLUCB,
-    MP_E_Greedy(0.7)(_, _, _, _), MP_E_Greedy(0.8)(_, _, _, _), MP_E_Greedy(0.9)(_, _, _, _), MP_E_Greedy(0.99)(_, _, _, _),
-
-    // Passive approaches
-    MP_D_TS(0.7)(_,_,_,_), MP_D_TS(0.8)(_,_,_,_), MP_D_TS(0.9)(_,_,_,_), MP_D_TS(0.99)(_,_,_,_),
-    MP_D_UCB(0.7)(_,_,_,_), MP_D_UCB(0.8)(_,_,_,_), MP_D_UCB(0.9)(_,_,_,_), MP_D_UCB(0.99)(_,_,_,_),
-    MP_SW_UCB(100)(_, _, _, _), MP_SW_UCB(500)(_, _, _, _), MP_SW_UCB(1000)(_, _, _, _), MP_SW_UCB(5000)(_, _, _, _),
-    MP_SW_TS(100)(_, _, _, _), MP_SW_TS(500)(_, _, _, _), MP_SW_TS(1000)(_, _, _, _), MP_SW_TS(5000)(_, _, _, _),
-    MP_SW_UCB_SHARP_A(0.1, 12.3)(_,_,_,_),
-    MP_SW_UCB_SHARP_G(0.1, 4.3)(_,_,_,_),
-    MP_SW_UCB_SHARP_A(0.2, 12.3)(_,_,_,_),
-    MP_SW_UCB_SHARP_G(0.2, 4.3)(_,_,_,_),
-    MP_RExp3(100)(_,_,_,_),
-    MP_RExp3(500)(_,_,_,_),
-    MP_RExp3(1000)(_,_,_,_),
-    MP_RExp3(5000)(_,_,_,_),
-
-    // Active
-    MP_GLR_KL_UCB_G(_,_,_,_),
-    MP_GLR_KL_UCB_L(_,_,_,_),
-    MP_M_UCB(1000, 10)(_,_,_,_), MP_M_UCB(5000, 10)(_,_,_,_),
-    MP_M_UCB(1000, 100)(_,_,_,_), MP_M_UCB(5000, 100)(_,_,_,_),
-
-    // Ours
-    MP_ADS_TS_ADWIN1(0.1)(_,_,_,_),
-    MP_ADS_TS_ADWIN1(0.01)(_,_,_,_),
-    MP_ADS_TS_ADWIN1(0.001)(_,_,_,_),
-    MP_ADS_TS_ADWIN1(0.0001)(_,_,_,_),
-    MP_ADS_TS_ADWIN1(0.00001)(_,_,_,_),
-    MP_ADS_TS_ADWIN1(0.1,ADR=true)(_,_,_,_),
-    MP_ADS_TS_ADWIN1(0.01,ADR=true)(_,_,_,_),
-    MP_ADS_TS_ADWIN1(0.001,ADR=true)(_,_,_,_),
-    MP_ADS_TS_ADWIN1(0.0001,ADR=true)(_,_,_,_),
-    MP_ADS_TS_ADWIN1(0.00001,ADR=true)(_,_,_,_),
-    MP_ADR_Elimination_UCB(0.1)(_,_,_,_),
-    MP_ADR_Elimination_UCB(0.01)(_,_,_,_),
-    MP_ADR_Elimination_UCB(0.001)(_,_,_,_),
-    MP_ADR_Elimination_UCB(0.0001)(_,_,_,_),
-    MP_ADR_Elimination_UCB(0.00001)(_,_,_,_),
   )
 
   def run(): Unit = {
     info(s"${formatter.format(java.util.Calendar.getInstance().getTime)} - Starting com.edouardfouche.experiments - ${this.getClass.getSimpleName}")
     // display parameters
     info(s"Parameters:")
-    info(s"lmin:$lmin, lmax: $lmax")
+    // info(s"lmin:$lmin, lmax: $lmax")
     info(s"data:${data.id}")
     info(s"scalingstrategies: ${scalingstrategies.map(_.name) mkString ", "}")
     info(s"reward: ${reward.name}")
     info(s"nRep: ${nRep}")
 
     for {
-      scalingstrategy <- scalingstrategies.par
+      scalingstrategy <- scalingstrategies //.par
     } {
-      for{
+      for {
         banditConstructor <- banditConstructors.par
       } {
         var allgains: linalg.Vector[Double] = linalg.Vector((1 to streamsimulator.nbatches).map(x => 0.0).toArray)
         var allks: linalg.Vector[Double] = linalg.Vector((1 to streamsimulator.nbatches).map(x => 0.0).toArray)
         var allcpu: linalg.Vector[Double] = linalg.Vector((1 to streamsimulator.nbatches).map(x => 0.0).toArray)
-        var allinfocounts:  linalg.Vector[Double] = linalg.Vector((1 to streamsimulator.nbatches).map(x => 0.0).toArray)
+        var allinfocounts: linalg.Vector[Double] = linalg.Vector((1 to streamsimulator.nbatches).map(x => 0.0).toArray)
 
 
         for {
@@ -149,14 +97,14 @@ object BanditRealWorld_Zozo_bts extends BanditExperiment {
         val bandit = banditConstructor(streamsimulator.copy(), reward, scalingstrategy, scalingstrategy.k)
         for{
           step <- 0 until allgains.length
-        }{
+        } {
           val summary = ExperimentSummary(attributes)
           summary.add("bandit", bandit.name)
           summary.add("dataset", bandit.stream.dataset.id)
           summary.add("scalingstrategy", bandit.scalingstrategy.name)
-          summary.add("k",  "%.2f".format(allks(step)))
-          summary.add("gain",  "%.2f".format(allgains(step)))
-          summary.add("cputime", "%.4f".format(allcpu(step)))
+          summary.add("k", "%.2f".format(allks(step)).replace(",", "."))
+          summary.add("gain", "%.2f".format(allgains(step)).replace(",", "."))
+          summary.add("cputime", "%.4f".format(allcpu(step)).replace(",", "."))
           summary.add("iteration", step)
           summary.write(summaryPath)
         }
