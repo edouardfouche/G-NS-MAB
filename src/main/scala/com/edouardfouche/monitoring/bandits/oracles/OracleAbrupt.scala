@@ -30,7 +30,7 @@ import com.edouardfouche.streamsimulator.Simulator
   * @param k               the initial number of pull per round
   */
 case class OracleAbrupt(stream: Simulator, reward: Reward, scalingstrategy: ScalingStrategy, var k: Int) extends Bandit {
-  val name: String = "CustomOracle"
+  val name: String = "CustomOracle-Abrupt"
 
   val n = 10000 // 100000
   val d = 100

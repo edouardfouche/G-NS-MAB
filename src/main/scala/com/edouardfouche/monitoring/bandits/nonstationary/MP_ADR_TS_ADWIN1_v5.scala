@@ -29,7 +29,6 @@ import com.edouardfouche.streamsimulator.Simulator
   * ADS-TS drops the oldest window, while ADR-TS drops both windows
   *
   * @param delta           the parameter for ADWIN (upper bound for the false positive rate)
-  * @param ADR             If true, reset the ADWIN window whenever a change is detected (instead of shrinking)
   * @param stream          a stream simulator on which we let this bandit run
   * @param reward          the reward function which derives the gains for each action
   * @param scalingstrategy the scaling strategy, which decides how many arms to pull for the next step
