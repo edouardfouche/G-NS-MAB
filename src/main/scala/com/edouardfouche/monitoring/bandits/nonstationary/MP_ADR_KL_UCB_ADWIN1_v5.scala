@@ -64,8 +64,8 @@ case class MP_ADR_KL_UCB_ADWIN1_v5(delta: Double)(val stream: Simulator, val rew
         monitored = false
 
         val klindices: Array[(Int, Double)] = (0 until narms).map(x =>
-          if (tarms(x) == 0 | counts(x) == 0.0) (x, 1.0 + Gaussian(0, 1).draw() * 0.000001)
-          else (x, getKLUCBupper(x, tarms(x)) + Gaussian(0, 1).draw() * 0.000001)).toArray
+          if (t == 0 | counts(x) == 0.0) (x, 1.0 + Gaussian(0, 1).draw() * 0.000001)
+          else (x, getKLUCBupper(x, t) + Gaussian(0, 1).draw() * 0.000001)).toArray
 
         val sortedindices = klindices.sortBy(-_._2).map(_._1)
         sortedindices.take(k)
@@ -118,6 +118,12 @@ case class MP_ADR_KL_UCB_ADWIN1_v5(delta: Double)(val stream: Simulator, val rew
       // Advancement
       historymonitored = historymonitored :+ updates
       t += 1
+
+      // increment personal counter of each arm
+      // (0 until narms).foreach { x =>
+      //  tarms(x) += 1
+      //}
+
       k = scalingstrategy.scale(gains, indexes, sums, counts, t)
 
       // val reverse_L_history_arms: List[Int] = history.reverse.take(L).flatMap(x => x.keys)
@@ -150,6 +156,7 @@ case class MP_ADR_KL_UCB_ADWIN1_v5(delta: Double)(val stream: Simulator, val rew
               // beta_params = (0 until narms).map(x => (1.0, 1.0)).toArray
               sums = (0 until narms).map(_ => initializationvalue).toArray // Initialization the weights to maximal gain forces to exploration at the early phase
               counts = sums.map(_ => initializationvalue)
+              //tarms = sums.map(_ => initializationvalue)
 
               m = (0 until narms).map(x => 0).toArray // Counter for each arm
               horizon = horizon - t.toInt

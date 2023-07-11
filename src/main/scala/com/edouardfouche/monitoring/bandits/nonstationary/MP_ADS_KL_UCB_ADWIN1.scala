@@ -44,8 +44,8 @@ case class MP_ADS_KL_UCB_ADWIN1(delta: Double, ADR: Boolean = false)(val stream:
   def next: (Array[(Int, Int)], Array[Double], Double) = {
 
     val klindices: Array[(Int, Double)] = (0 until narms).map(x =>
-      if (tarms(x) == 0 | counts(x) == 0.0) (x, 1.0 + Gaussian(0, 1).draw() * 0.000001)
-      else (x, getKLUCBupper(x, tarms(x)) + Gaussian(0, 1).draw() * 0.000001)).toArray
+      if (t == 0 | counts(x) == 0.0) (x, 1.0 + Gaussian(0, 1).draw() * 0.000001)
+      else (x, getKLUCBupper(x, t) + Gaussian(0, 1).draw() * 0.000001)).toArray
 
     val sortedindices = klindices.sortBy(-_._2).map(_._1)
     val indexes: Array[Int] = sortedindices.take(k)
@@ -77,6 +77,11 @@ case class MP_ADS_KL_UCB_ADWIN1(delta: Double, ADR: Boolean = false)(val stream:
     history = history :+ updates
     t += 1
 
+    // increment personal counter of each arm
+    // (0 until narms).foreach { x =>
+    //  tarms(x) += 1
+    //}
+
     k = scalingstrategy.scale(gains, indexes, sums, counts, t)
 
     // ADWIN1 change detection
@@ -97,6 +102,7 @@ case class MP_ADS_KL_UCB_ADWIN1(delta: Double, ADR: Boolean = false)(val stream:
                 history = List()
                 sums = (0 until narms).map(_ => initializationvalue).toArray // Initialization the weights to maximal gain forces to exploration at the early phase
                 counts = sums.map(_ => initializationvalue)
+                //tarms = sums.map(_ => initializationvalue)
               } else { //ADS
                 (0 until narms).foreach { z => cumulative_history(z) = cumulative_history(z).drop(i + 1) } // Remove first i elements
                 val torollback = history.take(i + 1)
@@ -106,6 +112,7 @@ case class MP_ADS_KL_UCB_ADWIN1(delta: Double, ADR: Boolean = false)(val stream:
                     sums(key) = sums(key) - value
                     counts(key) = counts(key) - 1 //- value._2
                   }
+                  //tarms = tarms.map(x => x - 1)
                 }
               }
             }
