@@ -29,20 +29,19 @@ import com.edouardfouche.streamsimulator.Simulator
   * ADS-TS drops the oldest window, while ADR-TS drops both windows
   *
   * @param delta           the parameter for ADWIN (upper bound for the false positive rate)
-  * @param ADR             If true, reset the ADWIN window whenever a change is detected (instead of shrinking)
   * @param stream          a stream simulator on which we let this bandit run
   * @param reward          the reward function which derives the gains for each action
   * @param scalingstrategy the scaling strategy, which decides how many arms to pull for the next step
   * @param k               the initial number of pull per round
   */
 case class MP_ADR_KL_UCB_ADWIN1_v5(delta: Double)(val stream: Simulator, val reward: Reward, val scalingstrategy: ScalingStrategy, var k: Int) extends BanditKLUCB with BanditAdwin {
-  val name = s"MP-ADR-TS-ADWIN1-v5; d=$delta"
+  val name = s"MP-ADR-KL-UCB-ADWIN1-v5; d=$delta"
   // Monitoring parameters (new)
   val D: Int = narms
   var cumulative_history: scala.collection.mutable.Map[Int, Array[(Int, Double)]] =
     collection.mutable.Map((0 until narms).map(x => x -> Array[(Int, Double)]()).toMap.toSeq: _*)
   var horizon: Int = stream.nbatches
-  // var L: Int = narms // Block length //TODO: How to set???
+  // var L: Int = narms // Block length
   // var M: Int = math.ceil(horizon/L).toInt // Number of blocks
   // var monitoredArms: Array[Int] = (0 until narms).map(x => x).toArray // Set of monitored arms (mathcal L)
   var m: Array[Int] = (0 until narms).map(x => 0).toArray // Counter for each arm
@@ -91,7 +90,7 @@ case class MP_ADR_KL_UCB_ADWIN1_v5(delta: Double)(val stream: Simulator, val rew
         counts(x._1) += 1.0
         sums(x._1) += d
 
-        if (!monitored) { // The counter of most drawnarms excluding monitoring rounds
+        if (!monitored) { // Increase the counter of drawn arm excluding monitoring rounds
           m(x._1) += 1
         }
 
