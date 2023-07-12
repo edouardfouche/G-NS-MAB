@@ -171,7 +171,7 @@ case class MP_ADR_KL_UCB_ADWIN1_v5(delta: Double)(val stream: Simulator, val rew
         }
       }
     }
-    t = history.length + 1 // The time context is the same as the history, which is the same as the smallest window
+    t = historymonitored.length + 1 // The time context is the same as the history, which is the same as the smallest window
     (arms, gains, gains.sum)
   }
 
