@@ -210,7 +210,7 @@ trait BanditExperiment extends LazyLogging {
     OracleStatic,
     OracleRandom,
     OracleAbruptGlobal,
-    OracleAbruptGlobal,
+    OracleGradualGlobal,
     // Ours
     MP_ADS_TS_ADWIN1(0.1)(_, _, _, _),
     MP_ADS_TS_ADWIN1(0.01)(_, _, _, _),
